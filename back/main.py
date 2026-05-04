@@ -122,7 +122,7 @@ def public_user(user: Dict[str, Any]) -> Dict[str, Any]:
 def get_current_user(authorization: Optional[str] = Header(default=None)) -> Dict[str, Any]:
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-    token = authorization.removeprefix("Bearer ").strip()
+    token = authorization[len("Bearer "):].strip()
     data = read_data()
     user_id = data["sessions"].get(token)
     if not user_id:
