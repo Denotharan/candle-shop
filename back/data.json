@@ -1,0 +1,67 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Midnight Lavender",
+      "description": "A calming blend of French lavender and deep woods, perfect for unwinding after a long day.",
+      "price": 28,
+      "scent_family": "Floral",
+      "burn_time": "45-50 hours",
+      "stock_quantity": 15,
+      "scent_profile": {
+        "top": "Bergamot",
+        "middle": "French Lavender",
+        "base": "Cedarwood"
+      },
+      "image_url": "https://images.unsplash.com/photo-1605814046907-7bc944d18721?auto=format&fit=crop&q=80&w=800"
+    },
+    {
+      "id": 2,
+      "name": "Sandalwood & Fig",
+      "description": "Warm, earthy sandalwood paired with the subtle sweetness of ripe fig. An elegant and grounding aroma.",
+      "price": 32,
+      "scent_family": "Woody",
+      "burn_time": "50-60 hours",
+      "stock_quantity": 8,
+      "scent_profile": {
+        "top": "Fig Leaf",
+        "middle": "Violet",
+        "base": "Sandalwood"
+      },
+      "image_url": "https://images.unsplash.com/photo-1602874801007-bd458cb6b9ea?auto=format&fit=crop&q=80&w=800"
+    },
+    {
+      "id": 3,
+      "name": "Sicilian Lemon",
+      "description": "Bright and refreshing citrus notes that energize any space. Like a sunny day in a jar.",
+      "price": 24,
+      "scent_family": "Citrus",
+      "burn_time": "40-45 hours",
+      "stock_quantity": 20,
+      "scent_profile": {
+        "top": "Lemon Zest",
+        "middle": "Basil",
+        "base": "White Musk"
+      },
+      "image_url": "https://images.unsplash.com/photo-1608181708892-3c224b52e391?auto=format&fit=crop&q=80&w=800"
+    },
+    {
+      "id": 4,
+      "name": "Forest Rain",
+      "description": "The crisp scent of damp earth and pine needles after a heavy rainfall.",
+      "price": 26,
+      "scent_family": "Earthy",
+      "burn_time": "45-55 hours",
+      "stock_quantity": 12,
+      "scent_profile": {
+        "top": "Petrichor",
+        "middle": "Pine",
+        "base": "Oakmoss"
+      },
+      "image_url": "https://images.unsplash.com/photo-1591122822187-5784c6c06a88?auto=format&fit=crop&q=80&w=800"
+    }
+  ],
+  "users": [],
+  "sessions": {},
+  "carts": {}
+}
