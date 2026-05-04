@@ -414,12 +414,18 @@ function Register({ actions }) {
 }
 
 function Admin({ products, actions }) {
-  const submit = (event) => { event.preventDefault(); actions.addProduct(new FormData(event.currentTarget)); event.currentTarget.reset() }
+  const [imageResetKey, setImageResetKey] = useState(0)
+  const submit = async (event) => {
+    event.preventDefault()
+    await actions.addProduct(new FormData(event.currentTarget))
+    event.currentTarget.reset()
+    setImageResetKey((key) => key + 1)
+  }
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
       <div className="flex justify-between items-center mb-16 border-b border-[#E5E5E5] dark:border-gray-800 pb-6 transition-colors duration-300"><h1 className="text-4xl text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide transition-colors duration-300">Admin Dashboard</h1><button onClick={actions.logout} className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Logout</button></div>
       <div className="lg:grid lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-5 mb-16 lg:mb-0"><div className="bg-white dark:bg-[#1E1E1E] p-8 border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><h2 className="text-2xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-8 transition-colors duration-300">Add New Product</h2><form onSubmit={submit} className="space-y-6"><AdminInput label="Product Name" name="name" /><AdminTextArea label="Description" name="description" /><div className="grid grid-cols-2 gap-6"><AdminInput label="Price ($)" name="price" type="number" step="0.01" /><AdminInput label="Stock Quantity" name="stock" type="number" /></div><div><label htmlFor="scent_family" className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Scent Family</label><select name="scent_family" id="scent_family" className="block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300"><option value="Floral">Floral</option><option value="Woody">Woody</option><option value="Citrus">Citrus</option><option value="Earthy">Earthy</option></select></div><div className="space-y-4 border-t border-[#E5E5E5] dark:border-gray-800 pt-6 transition-colors duration-300"><label className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-colors duration-300">Scent Profile</label><AdminBareInput name="scent_top" placeholder="Top Note" /><AdminBareInput name="scent_mid" placeholder="Middle Note" /><AdminBareInput name="scent_base" placeholder="Base Note" /></div><AdminInput label="Burn Time" name="burn_time" placeholder="e.g. 40-50 hours" /><AdminInput label="Image URL (Optional)" name="image_url" required={false} /><button type="submit" className="w-full btn-primary py-4 text-xs uppercase tracking-[0.2em] mt-8 dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">Add Product</button></form></div></div>
+        <div className="lg:col-span-5 mb-16 lg:mb-0"><div className="bg-white dark:bg-[#1E1E1E] p-8 border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><h2 className="text-2xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-8 transition-colors duration-300">Add New Product</h2><form onSubmit={submit} className="space-y-6"><AdminInput label="Product Name" name="name" /><AdminTextArea label="Description" name="description" /><div className="grid grid-cols-2 gap-6"><AdminInput label="Price ($)" name="price" type="number" step="0.01" /><AdminInput label="Stock Quantity" name="stock" type="number" /></div><div><label htmlFor="scent_family" className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Scent Family</label><select name="scent_family" id="scent_family" className="block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300"><option value="Floral">Floral</option><option value="Woody">Woody</option><option value="Citrus">Citrus</option><option value="Earthy">Earthy</option></select></div><div className="space-y-4 border-t border-[#E5E5E5] dark:border-gray-800 pt-6 transition-colors duration-300"><label className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-colors duration-300">Scent Profile</label><AdminBareInput name="scent_top" placeholder="Top Note" /><AdminBareInput name="scent_mid" placeholder="Middle Note" /><AdminBareInput name="scent_base" placeholder="Base Note" /></div><AdminInput label="Burn Time" name="burn_time" placeholder="e.g. 40-50 hours" /><AdminImageDropzone resetKey={imageResetKey} /><button type="submit" className="w-full btn-primary py-4 text-xs uppercase tracking-[0.2em] mt-8 dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">Add Product</button></form></div></div>
         <div className="lg:col-span-7"><div className="bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><div className="px-8 py-6 border-b border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide transition-colors duration-300">Inventory</h3></div><ul className="divide-y divide-[#E5E5E5] dark:divide-gray-800 transition-colors duration-300">{products.length ? products.map((product) => <li key={product.id} className="px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center mb-4 sm:mb-0"><div className="flex-shrink-0 h-16 w-12 bg-[#F8F5F0] dark:bg-[#2A2A2A] flex items-center justify-center overflow-hidden border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300">{product.image_url ? <img src={product.image_url} alt="" className="h-full w-full object-cover" /> : <span className="text-[0.5rem] uppercase tracking-widest text-gray-400">IMG</span>}</div><div className="ml-6"><p className="text-base text-[#121212] dark:text-[#F8F5F0] brand-font mb-1 transition-colors duration-300">{product.name}</p><p className="text-[0.65rem] text-gray-500 dark:text-gray-400 uppercase tracking-widest transition-colors duration-300">{product.scent_family} | Stock: {product.stock_quantity}</p></div></div><div className="text-sm text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(product.price)}</div></li>) : <li className="px-8 py-10 text-center text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest transition-colors duration-300">No products in inventory. Add one to get started.</li>}</ul></div></div>
       </div>
     </div>
@@ -468,6 +474,61 @@ function AdminTextArea({ label, name }) {
 
 function AdminBareInput({ name, placeholder }) {
   return <div><input type="text" name={name} placeholder={placeholder} className="block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300" /></div>
+}
+
+function AdminImageDropzone({ resetKey }) {
+  const [imageValue, setImageValue] = useState('')
+  const [isDragging, setIsDragging] = useState(false)
+
+  useEffect(() => {
+    setImageValue('')
+    setIsDragging(false)
+  }, [resetKey])
+
+  const useFile = (file) => {
+    if (!file || !file.type.startsWith('image/')) return
+    const reader = new FileReader()
+    reader.onload = () => setImageValue(reader.result)
+    reader.readAsDataURL(file)
+  }
+
+  const handleDrop = (event) => {
+    event.preventDefault()
+    setIsDragging(false)
+    useFile(event.dataTransfer.files?.[0])
+  }
+
+  return (
+    <div>
+      <label htmlFor="image_url" className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Image URL</label>
+      <div
+        onDragOver={(event) => { event.preventDefault(); setIsDragging(true) }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={handleDrop}
+        className={`border border-dashed ${isDragging ? 'border-[#D9B38C] bg-[#f0eae1] dark:bg-[#2A2A2A]' : 'border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212]'} transition-colors duration-300`}
+      >
+        <label htmlFor="product-image-file" className="block cursor-pointer p-5 text-center">
+          {imageValue ? (
+            <img src={imageValue} alt="" className="mx-auto mb-4 h-36 w-28 object-cover border border-[#E5E5E5] dark:border-gray-800" />
+          ) : (
+            <div className="mx-auto mb-4 h-36 w-28 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-gray-800 flex items-center justify-center text-[#D9B38C] brand-font text-xl tracking-widest uppercase">Serein</div>
+          )}
+          <span className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">Drop image here or click to choose</span>
+        </label>
+        <input id="product-image-file" type="file" accept="image/*" className="sr-only" onChange={(event) => useFile(event.target.files?.[0])} />
+      </div>
+      <input
+        id="image_url"
+        name="image_url"
+        type="text"
+        required
+        value={imageValue}
+        onChange={(event) => setImageValue(event.target.value)}
+        placeholder="PASTE IMAGE URL"
+        className="mt-3 block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300"
+      />
+    </div>
+  )
 }
 
 function Divider() {
