@@ -7,7 +7,7 @@ import json
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from models import Credentials, RegisterRequest, ProductIn
 
 
 DATA_FILE = Path(__file__).with_name("data.json")
@@ -23,32 +23,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-class Credentials(BaseModel):
-    email: str
-    password: str
-
-
-class RegisterRequest(Credentials):
-    name: str
-
-
-class ScentProfile(BaseModel):
-    top: str = "N/A"
-    middle: str = "N/A"
-    base: str = "N/A"
-
-
-class ProductIn(BaseModel):
-    name: str
-    description: str
-    price: float
-    scent_family: str
-    burn_time: str
-    stock_quantity: int = Field(ge=0)
-    image_url: Optional[str] = ""
-    scent_profile: ScentProfile
 
 
 def seed_data() -> Dict[str, Any]:
