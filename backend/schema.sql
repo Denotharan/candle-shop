@@ -1,11 +1,18 @@
 -- schema.sql
 -- Run this in your Supabase SQL Editor
 
+-- Clean up existing tables (Optional: remove these if you want to keep existing data)
+DROP TABLE IF EXISTS public.cart_items;
+DROP TABLE IF EXISTS public.sessions;
+DROP TABLE IF EXISTS public.products;
+DROP TABLE IF EXISTS public.users;
+
 -- Create Users Table
 CREATE TABLE public.users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE,
+    phone TEXT UNIQUE,
     password TEXT NOT NULL,
     is_admin BOOLEAN DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
@@ -39,6 +46,13 @@ CREATE TABLE public.cart_items (
     quantity INTEGER DEFAULT 1,
     PRIMARY KEY (user_id, product_id)
 );
+
+-- Disable RLS for all tables to allow simple access
+-- (In a production app, you would instead set up specific RLS policies)
+ALTER TABLE public.users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.products DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sessions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cart_items DISABLE ROW LEVEL SECURITY;
 
 -- Seed Data for Products
 INSERT INTO public.products (name, description, price, scent_family, burn_time, stock_quantity, image_url, scent_profile) VALUES
