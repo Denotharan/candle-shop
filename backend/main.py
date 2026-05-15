@@ -62,6 +62,11 @@ def health() -> Dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/")
+def root() -> Dict[str, str]:
+    return {"status": "ok", "service": "Serein API"}
+
+
 @app.get("/products")
 def products(family: Optional[str] = None) -> List[Dict[str, Any]]:
     if supabase is None:
