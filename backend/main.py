@@ -11,17 +11,22 @@ from database import supabase
 
 ADMIN_USERNAME = "admin@123"
 ADMIN_PASSWORD = "admin@123"
+ADMIN_SESSION_TOKEN = "admin-session-token"
 
 app = FastAPI(title="Serein API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5173", "http://localhost:5173", "https://candle-shop-liard.vercel.app/"],
-    allow_origin_regex=r"http://(127\.0\.0\.1|localhost):\d+",
+    allow_origins=["http://127.0.0.1:5173", "http://localhost:5173"],
+    allow_origin_regex=r"https://[a-z0-9-]+\.vercel\.app|http://(127\.0\.0\.1|localhost):\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def admin_user() -> Dict[str, Any]:
+    return {"id": "admin", "name": "Admin", "email": ADMIN_USERNAME, "is_admin": True}
 
 
 def public_user(user: Dict[str, Any]) -> Dict[str, Any]:
@@ -32,6 +37,9 @@ def get_current_user(authorization: Optional[str] = Header(default=None)) -> Dic
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     token = authorization[len("Bearer "):].strip()
+
+    if token == ADMIN_SESSION_TOKEN:
+        return admin_user()
     
     if supabase is None:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Supabase not configured")
@@ -42,7 +50,7 @@ def get_current_user(authorization: Optional[str] = Header(default=None)) -> Dic
     
     user_id = res.data[0]["user_id"]
     if user_id == "admin":
-        return {"id": "admin", "name": "Admin", "email": ADMIN_USERNAME, "is_admin": True}
+        return admin_user()
         
     res_user = supabase.table("users").select("*").eq("id", user_id).execute()
     if not res_user.data:
@@ -87,16 +95,14 @@ def create_product(product: ProductIn) -> Dict[str, Any]:
 
 @app.post("/auth/login")
 def login(credentials: Credentials) -> Dict[str, Any]:
-    if supabase is None:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Supabase not configured")
-
     if not credentials.email and not credentials.phone:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email or phone number is required.")
 
     if credentials.email == ADMIN_USERNAME and credentials.password == ADMIN_PASSWORD:
-        token = uuid4().hex
-        supabase.table("sessions").insert({"token": token, "user_id": "admin"}).execute()
-        return {"token": token, "user": {"id": "admin", "name": "Admin", "email": ADMIN_USERNAME, "is_admin": True}}
+        return {"token": ADMIN_SESSION_TOKEN, "user": admin_user()}
+
+    if supabase is None:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Supabase not configured")
 
     query = supabase.table("users").select("*")
     if credentials.email:
