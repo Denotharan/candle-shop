@@ -17,6 +17,7 @@ app = FastAPI(title="Serein API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://127.0.0.1:5173", "http://localhost:5173", "http://127.0.0.1:5174", "http://localhost:5174"],
+    allow_origin_regex=r"http://(127\.0\.0\.1|localhost):\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,7 +25,7 @@ app.add_middleware(
 
 
 def public_user(user: Dict[str, Any]) -> Dict[str, Any]:
-    return {"id": user["id"], "name": user["name"], "email": user.get("email", ""), "is_admin": user.get("is_admin", False)}
+    return {"id": user["id"], "name": user["name"], "email": user.get("email", ""), "phone": user.get("phone", ""), "is_admin": user.get("is_admin", False)}
 
 
 def get_current_user(authorization: Optional[str] = Header(default=None)) -> Dict[str, Any]:
@@ -84,14 +85,24 @@ def login(credentials: Credentials) -> Dict[str, Any]:
     if supabase is None:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Supabase not configured")
 
+    if not credentials.email and not credentials.phone:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email or phone number is required.")
+
     if credentials.email == ADMIN_USERNAME and credentials.password == ADMIN_PASSWORD:
         token = uuid4().hex
         supabase.table("sessions").insert({"token": token, "user_id": "admin"}).execute()
         return {"token": token, "user": {"id": "admin", "name": "Admin", "email": ADMIN_USERNAME, "is_admin": True}}
 
-    res = supabase.table("users").select("*").eq("email", credentials.email).eq("password", credentials.password).execute()
+    query = supabase.table("users").select("*")
+    if credentials.email:
+        query = query.eq("email", credentials.email)
+    else:
+        query = query.eq("phone", credentials.phone)
+    query = query.eq("password", credentials.password)
+    res = query.execute()
+
     if not res.data:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email/username or password.")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials.")
     
     user = res.data[0]
     token = uuid4().hex
@@ -104,16 +115,29 @@ def register(payload: RegisterRequest) -> Dict[str, Any]:
     if supabase is None:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Supabase not configured")
 
-    res = supabase.table("users").select("id").eq("email", payload.email).execute()
-    if res.data:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered.")
+    if not payload.email and not payload.phone:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email or phone number is required.")
+
+    # Check for existing user by email or phone
+    if payload.email:
+        res = supabase.table("users").select("id").eq("email", payload.email).execute()
+        if res.data:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered.")
+    if payload.phone:
+        res = supabase.table("users").select("id").eq("phone", payload.phone).execute()
+        if res.data:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Phone number already registered.")
     
     user_data = {
         "name": payload.name,
-        "email": payload.email,
         "password": payload.password,
         "is_admin": False
     }
+    if payload.email:
+        user_data["email"] = payload.email
+    if payload.phone:
+        user_data["phone"] = payload.phone
+
     insert_res = supabase.table("users").insert(user_data).execute()
     user = insert_res.data[0]
     

@@ -11,7 +11,8 @@ DROP TABLE IF EXISTS public.users;
 CREATE TABLE public.users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE,
+    phone TEXT UNIQUE,
     password TEXT NOT NULL,
     is_admin BOOLEAN DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())

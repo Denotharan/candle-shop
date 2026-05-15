@@ -2,12 +2,16 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 class Credentials(BaseModel):
-    email: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
     password: str
 
 
-class RegisterRequest(Credentials):
+class RegisterRequest(BaseModel):
     name: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    password: str
 
 
 class ScentProfile(BaseModel):
