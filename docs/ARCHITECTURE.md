@@ -102,8 +102,8 @@ Products are catalog entries with an integer `id`, display fields, inventory dat
 
 Registered users are stored directly in `users`, including plaintext passwords in the current development implementation. Sessions map opaque token strings to user ids. The built-in admin user is not stored in `users`; it is recognized by hardcoded credentials:
 
-- Username: `admin`
-- Password: `admin`
+- Email: `admin@123`
+- Password: `admin@123`
 
 Admin sessions map their token to the special user id `admin`.
 
@@ -193,8 +193,8 @@ http://127.0.0.1:8000
 The backend currently uses constants in `backend/main.py` for:
 
 - Data file path: `backend/data.json`
-- Admin username: `admin`
-- Admin password: `admin`
+- Admin email: `admin@123`
+- Admin password: `admin@123`
 - CORS origins for local Vite ports `5173` and `5174`
 
 `backend/.env` exists, but the current backend code does not load it.
@@ -244,4 +244,3 @@ Good next architectural steps, in order of impact:
 5. Add order records and inventory decrementing during checkout.
 6. Add tests around auth, cart mutation, product creation, and checkout.
 7. Move Tailwind into the frontend build pipeline instead of using the CDN.
-

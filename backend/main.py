@@ -9,8 +9,8 @@ from models import Credentials, RegisterRequest, ProductIn
 from database import supabase
 
 
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin"
+ADMIN_USERNAME = "admin@123"
+ADMIN_PASSWORD = "admin@123"
 
 app = FastAPI(title="Serein API")
 
