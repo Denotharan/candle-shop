@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
+const API_BASE = import.meta.env.VITE_API_URL || 'https://candle-shop-liard.vercel.app/'
 const currency = (value) => `$${Number(value).toFixed(2)}`
 const getStored = (key, fallback) => {
   try {
