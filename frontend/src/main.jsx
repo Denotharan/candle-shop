@@ -87,11 +87,14 @@ function App() {
   const actions = {
     navigate,
     flash,
-    async login(email, password) {
+    async login(identifier, password, mode = 'email') {
       try {
+        const body = mode === 'phone'
+          ? { phone: identifier, password }
+          : { email: identifier, password }
         const payload = await api('/auth/login', {
           method: 'POST',
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify(body),
         })
         saveAuth(payload)
         await loadCart()
@@ -100,11 +103,14 @@ function App() {
         flash(error.message)
       }
     },
-    async register(name, email, password) {
+    async register(name, identifier, password, mode = 'email') {
       try {
+        const body = mode === 'phone'
+          ? { name, phone: identifier, password }
+          : { name, email: identifier, password }
         const payload = await api('/auth/register', {
           method: 'POST',
-          body: JSON.stringify({ name, email, password }),
+          body: JSON.stringify(body),
         })
         saveAuth(payload)
         await loadCart()
@@ -400,17 +406,79 @@ function Cart({ products, cart, actions }) {
 }
 
 function AuthCard({ title, subtitle, children }) {
-  return <div className="min-h-[60vh] flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8"><div className="max-w-md w-full p-10 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><div className="mb-10 text-center"><h2 className="text-3xl brand-font text-[#121212] dark:text-[#F8F5F0] mb-4 transition-colors duration-300">{title}</h2><div className="w-8 h-[1px] bg-[#D9B38C] mx-auto mb-6"></div><p className="text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">{subtitle}</p></div>{children}</div></div>
+  return <div className="min-h-[60vh] flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8"><div className="max-w-lg w-full p-8 sm:p-10 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-gray-800 shadow-[0_18px_60px_rgba(18,18,18,0.08)] dark:shadow-none transition-colors duration-300"><div className="mb-10 text-center"><h2 className="text-3xl brand-font text-[#121212] dark:text-[#F8F5F0] mb-4 transition-colors duration-300">{title}</h2><div className="w-8 h-[1px] bg-[#D9B38C] mx-auto mb-6"></div><p className="text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">{subtitle}</p></div>{children}</div></div>
+}
+
+function AuthMethodSelector({ mode, setMode }) {
+  const optionClass = (value) => `flex-1 border px-4 py-4 text-left transition-all duration-300 ${mode === value
+    ? 'border-[#121212] dark:border-[#F8F5F0] bg-[#fcfbf9] dark:bg-[#121212] shadow-sm'
+    : 'border-[#E5E5E5] dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:border-[#D9B38C] dark:hover:border-[#D9B38C]'}`
+  return (
+    <div className="mb-8">
+      <p className="mb-3 text-[0.65rem] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">Sign in with</p>
+      <div className="grid grid-cols-2 gap-3" role="tablist" aria-label="Choose sign in method">
+        <button type="button" onClick={() => setMode('email')} className={optionClass('email')} role="tab" aria-selected={mode === 'email'}>
+          <span className="block text-xs uppercase tracking-[0.2em] text-[#121212] dark:text-[#F8F5F0]">Email</span>
+          <span className="mt-2 block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">Account address</span>
+        </button>
+        <button type="button" onClick={() => setMode('phone')} className={optionClass('phone')} role="tab" aria-selected={mode === 'phone'}>
+          <span className="block text-xs uppercase tracking-[0.2em] text-[#121212] dark:text-[#F8F5F0]">Phone</span>
+          <span className="mt-2 block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">Mobile number</span>
+        </button>
+      </div>
+    </div>
+  )
 }
 
 function Login({ actions }) {
-  const submit = (event) => { event.preventDefault(); const form = new FormData(event.currentTarget); actions.login(form.get('email'), form.get('password')) }
-  return <AuthCard title="Sign In" subtitle="Welcome back to Serein"><form className="space-y-6" onSubmit={submit}><Input name="email" type="text" placeholder="EMAIL OR USERNAME" /><Input name="password" type="password" placeholder="PASSWORD" /><button type="submit" className="w-full flex justify-center py-4 px-4 btn-primary text-xs uppercase tracking-[0.2em] dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">Sign In</button></form><div className="mt-10 text-center"><p className="text-xs tracking-widest text-gray-500 dark:text-gray-400">New to Serein? <Link to="/register" actions={actions} className="text-[#121212] dark:text-[#F8F5F0] border-b border-[#121212] dark:border-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] dark:hover:border-[#D9B38C] transition-colors pb-1">Create an Account</Link></p></div></AuthCard>
+  const [mode, setMode] = useState('email')
+  const submit = (event) => {
+    event.preventDefault()
+    const form = new FormData(event.currentTarget)
+    actions.login(form.get('identifier'), form.get('password'), mode)
+  }
+  return (
+    <AuthCard title="Sign In" subtitle="Welcome back to Serein">
+      <AuthMethodSelector mode={mode} setMode={setMode} />
+      <form className="space-y-6" onSubmit={submit} key={mode}>
+        {mode === 'email'
+          ? <Input name="identifier" type="email" placeholder="EMAIL ADDRESS" autoComplete="email" />
+          : <Input name="identifier" type="tel" placeholder="PHONE NUMBER" autoComplete="tel" inputMode="tel" />
+        }
+        <Input name="password" type="password" placeholder="PASSWORD" autoComplete="current-password" />
+        <button type="submit" className="w-full flex justify-center py-4 px-4 btn-primary text-xs uppercase tracking-[0.2em] dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">Sign In</button>
+      </form>
+      <div className="mt-10 text-center">
+        <p className="text-xs tracking-widest text-gray-500 dark:text-gray-400">New to Serein? <Link to="/register" actions={actions} className="text-[#121212] dark:text-[#F8F5F0] border-b border-[#121212] dark:border-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] dark:hover:border-[#D9B38C] transition-colors pb-1">Create an Account</Link></p>
+      </div>
+    </AuthCard>
+  )
 }
 
 function Register({ actions }) {
-  const submit = (event) => { event.preventDefault(); const form = new FormData(event.currentTarget); actions.register(form.get('name'), form.get('email'), form.get('password')) }
-  return <AuthCard title="Create Account" subtitle="Join the Serein collective"><form className="space-y-6" onSubmit={submit}><Input name="name" placeholder="FULL NAME" /><Input name="email" type="email" placeholder="EMAIL ADDRESS" /><Input name="password" type="password" placeholder="PASSWORD" /><button type="submit" className="w-full flex justify-center py-4 px-4 btn-primary text-xs uppercase tracking-[0.2em] dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">Create Account</button></form><div className="mt-10 text-center"><p className="text-xs tracking-widest text-gray-500 dark:text-gray-400">Already have an account? <Link to="/login" actions={actions} className="text-[#121212] dark:text-[#F8F5F0] border-b border-[#121212] dark:border-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] dark:hover:border-[#D9B38C] transition-colors pb-1">Sign In</Link></p></div></AuthCard>
+  const [mode, setMode] = useState('email')
+  const submit = (event) => {
+    event.preventDefault()
+    const form = new FormData(event.currentTarget)
+    actions.register(form.get('name'), form.get('identifier'), form.get('password'), mode)
+  }
+  return (
+    <AuthCard title="Create Account" subtitle="Join the Serein collective">
+      <AuthMethodSelector mode={mode} setMode={setMode} />
+      <form className="space-y-6" onSubmit={submit} key={mode}>
+        <Input name="name" placeholder="FULL NAME" autoComplete="name" />
+        {mode === 'email'
+          ? <Input name="identifier" type="email" placeholder="EMAIL ADDRESS" autoComplete="email" />
+          : <Input name="identifier" type="tel" placeholder="PHONE NUMBER" autoComplete="tel" inputMode="tel" />
+        }
+        <Input name="password" type="password" placeholder="PASSWORD" autoComplete="new-password" />
+        <button type="submit" className="w-full flex justify-center py-4 px-4 btn-primary text-xs uppercase tracking-[0.2em] dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">Create Account</button>
+      </form>
+      <div className="mt-10 text-center">
+        <p className="text-xs tracking-widest text-gray-500 dark:text-gray-400">Already have an account? <Link to="/login" actions={actions} className="text-[#121212] dark:text-[#F8F5F0] border-b border-[#121212] dark:border-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] dark:hover:border-[#D9B38C] transition-colors pb-1">Sign In</Link></p>
+      </div>
+    </AuthCard>
+  )
 }
 
 function Admin({ products, actions }) {
@@ -460,8 +528,8 @@ function Footer() {
   return <footer className="bg-[#F8F5F0] dark:bg-[#0a0a0a] border-t border-[#E5E5E5] dark:border-gray-800 mt-20 transition-colors duration-300"><div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex flex-col items-center justify-center text-center"><h2 className="text-2xl brand-font tracking-widest uppercase text-[#121212] dark:text-[#F8F5F0] mb-6">Serein</h2><div className="flex space-x-6 text-xs uppercase tracking-widest text-gray-500 mb-8"><a href="#" className="hover:text-[#121212] dark:hover:text-[#F8F5F0] transition-colors">About Us</a><a href="#" className="hover:text-[#121212] dark:hover:text-[#F8F5F0] transition-colors">Contact</a><a href="#" className="hover:text-[#121212] dark:hover:text-[#F8F5F0] transition-colors">Terms</a></div><p className="text-gray-400 text-xs tracking-wider">&copy; 2026 Serein. All rights reserved.</p></div></footer>
 }
 
-function Input({ name, type = 'text', placeholder }) {
-  return <div><label htmlFor={name} className="sr-only">{placeholder}</label><input id={name} name={name} type={type} required className="appearance-none block w-full px-4 py-3 border border-[#E5E5E5] dark:border-gray-800 placeholder-gray-400 dark:placeholder-gray-500 text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] focus:ring-0 text-sm tracking-widest bg-[#F8F5F0] dark:bg-[#121212] transition-colors duration-300" placeholder={placeholder} /></div>
+function Input({ name, type = 'text', placeholder, autoComplete, inputMode }) {
+  return <div><label htmlFor={name} className="block mb-2 text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">{placeholder}</label><input id={name} name={name} type={type} required autoComplete={autoComplete} inputMode={inputMode} className="appearance-none block w-full px-4 py-3 border border-[#E5E5E5] dark:border-gray-800 placeholder-gray-400 dark:placeholder-gray-500 text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] focus:ring-0 text-sm tracking-wider bg-[#F8F5F0] dark:bg-[#121212] transition-colors duration-300" placeholder={placeholder} /></div>
 }
 
 function AdminInput({ label, name, type = 'text', step, placeholder, required = true }) {
