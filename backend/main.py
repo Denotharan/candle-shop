@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from models import Credentials, RegisterRequest, ProductIn
+from models import Credentials, RegisterRequest, ProductIn, ScentFamilyIn
 from database import supabase
 
 
@@ -65,6 +65,13 @@ def require_admin(user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str,
     return user
 
 
+def ensure_scent_family(name: str) -> None:
+    name = name.strip()
+    if not name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Scent family is required")
+    supabase.table("scent_families").upsert({"name": name}, on_conflict="name").execute()
+
+
 @app.get("/health")
 def health() -> Dict[str, str]:
     return {"status": "ok"}
@@ -86,9 +93,32 @@ def products(family: Optional[str] = None) -> List[Dict[str, Any]]:
     return res.data
 
 
+@app.get("/scent-families")
+def scent_families() -> List[Dict[str, str]]:
+    if supabase is None:
+        return []
+    try:
+        res = supabase.table("scent_families").select("*").order("name").execute()
+        return res.data
+    except Exception:
+        res = supabase.table("products").select("scent_family").execute()
+        names = sorted({item["scent_family"] for item in res.data if item.get("scent_family")})
+        return [{"name": name} for name in names]
+
+
+@app.post("/scent-families", dependencies=[Depends(require_admin)])
+def create_scent_family(payload: ScentFamilyIn) -> Dict[str, str]:
+    name = payload.name.strip()
+    if not name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Scent family name is required")
+    res = supabase.table("scent_families").upsert({"name": name}, on_conflict="name").execute()
+    return res.data[0] if res.data else {"name": name}
+
+
 @app.post("/products", dependencies=[Depends(require_admin)])
 def create_product(product: ProductIn) -> Dict[str, Any]:
     item = product.model_dump()
+    ensure_scent_family(item["scent_family"])
     res = supabase.table("products").insert(item).execute()
     return res.data[0]
 
@@ -96,6 +126,7 @@ def create_product(product: ProductIn) -> Dict[str, Any]:
 @app.put("/products/{product_id}", dependencies=[Depends(require_admin)])
 def update_product(product_id: int, product: ProductIn) -> Dict[str, Any]:
     item = product.model_dump()
+    ensure_scent_family(item["scent_family"])
     res = supabase.table("products").update(item).eq("id", product_id).execute()
     if not res.data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")

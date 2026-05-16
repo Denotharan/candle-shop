@@ -5,6 +5,7 @@
 DROP TABLE IF EXISTS public.cart_items;
 DROP TABLE IF EXISTS public.sessions;
 DROP TABLE IF EXISTS public.products;
+DROP TABLE IF EXISTS public.scent_families;
 DROP TABLE IF EXISTS public.users;
 
 -- Create Users Table
@@ -18,13 +19,19 @@ CREATE TABLE public.users (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
+-- Create Scent Families Table
+CREATE TABLE public.scent_families (
+    name TEXT PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
 -- Create Products Table
 CREATE TABLE public.products (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
     price NUMERIC(10, 2) NOT NULL,
-    scent_family TEXT,
+    scent_family TEXT REFERENCES public.scent_families(name),
     burn_time TEXT,
     stock_quantity INTEGER DEFAULT 0,
     image_url TEXT,
@@ -50,9 +57,17 @@ CREATE TABLE public.cart_items (
 -- Disable RLS for all tables to allow simple access
 -- (In a production app, you would instead set up specific RLS policies)
 ALTER TABLE public.users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.scent_families DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sessions DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cart_items DISABLE ROW LEVEL SECURITY;
+
+-- Seed Data for Scent Families
+INSERT INTO public.scent_families (name) VALUES
+('Floral'),
+('Woody'),
+('Citrus'),
+('Earthy');
 
 -- Seed Data for Products
 INSERT INTO public.products (name, description, price, scent_family, burn_time, stock_quantity, image_url, scent_profile) VALUES
