@@ -93,6 +93,15 @@ def create_product(product: ProductIn) -> Dict[str, Any]:
     return res.data[0]
 
 
+@app.put("/products/{product_id}", dependencies=[Depends(require_admin)])
+def update_product(product_id: int, product: ProductIn) -> Dict[str, Any]:
+    item = product.model_dump()
+    res = supabase.table("products").update(item).eq("id", product_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
+    return res.data[0]
+
+
 @app.post("/auth/login")
 def login(credentials: Credentials) -> Dict[str, Any]:
     if not credentials.email and not credentials.phone:
