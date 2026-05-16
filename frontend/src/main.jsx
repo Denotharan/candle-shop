@@ -45,6 +45,7 @@ function App() {
   const [path, setPath] = useState(window.location.pathname)
   const [query, setQuery] = useState(new URLSearchParams(window.location.search))
   const [products, setProducts] = useState([])
+  const [scentFamilies, setScentFamilies] = useState([])
   const [cart, setCart] = useState({})
   const [user, setUser] = useState(() => getStored('user', null))
   const [messages, setMessages] = useState([])
@@ -85,10 +86,12 @@ function App() {
   }
 
   const loadProducts = async () => setProducts(await api('/products'))
+  const loadScentFamilies = async () => setScentFamilies((await api('/scent-families')).map((family) => family.name))
   const loadCart = async () => setCart(await api('/cart'))
 
   useEffect(() => {
     loadProducts().catch(() => flash('FastAPI backend is not running. Start it on port 8000.'))
+    loadScentFamilies().catch(() => setScentFamilies([]))
     if (localStorage.getItem('token')) {
       api('/auth/me')
         .then((currentUser) => {
@@ -202,6 +205,25 @@ function App() {
         flash(error.message)
       }
     },
+    async addScentFamily(name) {
+      const nextName = name.trim()
+      if (!nextName) {
+        flash('Scent family name is required.')
+        return null
+      }
+      try {
+        const family = await api('/scent-families', {
+          method: 'POST',
+          body: JSON.stringify({ name: nextName }),
+        })
+        await loadScentFamilies()
+        flash('Scent family added successfully.')
+        return family.name
+      } catch (error) {
+        flash(error.message)
+        return null
+      }
+    },
     toggleTheme() {
       const html = document.documentElement
       if (localStorage.getItem('theme')) {
@@ -228,10 +250,10 @@ function App() {
     if (path === '/cart') return <Cart products={products} cart={cart} actions={actions} />
     if (path === '/login') return <Login actions={actions} />
     if (path === '/register') return <Register actions={actions} />
-    if (path === '/admin') return user?.is_admin ? <Admin products={products} actions={actions} /> : <Login actions={actions} />
+    if (path === '/admin') return user?.is_admin ? <Admin products={products} scentFamilies={scentFamilies} actions={actions} /> : <Login actions={actions} />
     if (path === '/checkout_success') return <Success actions={actions} />
-    return <Home products={products} family={query.get('family')} actions={actions} />
-  }, [path, query, products, cart, user, themeTick])
+    return <Home products={products} scentFamilies={scentFamilies} family={query.get('family')} actions={actions} />
+  }, [path, query, products, scentFamilies, cart, user, themeTick])
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8F5F0] dark:bg-[#0a0a0a] text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">
@@ -301,7 +323,8 @@ function Nav({ user, cart, actions }) {
   )
 }
 
-function Home({ products, family, actions }) {
+function Home({ products, scentFamilies, family, actions }) {
+  const families = scentFamilies.length ? scentFamilies : [...new Set(products.map((product) => product.scent_family).filter(Boolean))]
   const filtered = family ? products.filter((product) => product.scent_family === family) : products
   const familyClass = (value) => (family === value || (!family && !value))
     ? 'text-[#121212] dark:text-[#F8F5F0] border-b border-[#121212] dark:border-[#F8F5F0] pb-1 transition-colors'
@@ -322,7 +345,7 @@ function Home({ products, family, actions }) {
           <h2 className="text-4xl brand-font text-[#121212] dark:text-[#F8F5F0] mb-4 transition-colors duration-300">Curated Scents</h2>
           <div className="w-12 h-[1px] bg-[#D9B38C] mx-auto mb-10"></div>
           <div className="flex flex-wrap justify-center gap-6 text-xs uppercase tracking-widest">
-            {[null, 'Floral', 'Woody', 'Citrus', 'Earthy'].map((item) => <Link key={item || 'All'} actions={actions} to={item ? `/?family=${item}` : '/'} preserveScroll className={familyClass(item)}>{item || 'All'}</Link>)}
+            {[null, ...families].map((item) => <Link key={item || 'All'} actions={actions} to={item ? `/?family=${encodeURIComponent(item)}` : '/'} preserveScroll className={familyClass(item)}>{item || 'All'}</Link>)}
           </div>
         </div>
         {filtered.length > 0 ? (
@@ -497,7 +520,7 @@ function Register({ actions }) {
   )
 }
 
-function Admin({ products, actions }) {
+function Admin({ products, scentFamilies, actions }) {
   const [imageResetKey, setImageResetKey] = useState(0)
   const [editingProduct, setEditingProduct] = useState(null)
   const isEditing = Boolean(editingProduct)
@@ -524,7 +547,7 @@ function Admin({ products, actions }) {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
       <div className="flex justify-between items-center mb-16 border-b border-[#E5E5E5] dark:border-gray-800 pb-6 transition-colors duration-300"><h1 className="text-4xl text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide transition-colors duration-300">Admin Dashboard</h1><button onClick={actions.logout} className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Logout</button></div>
       <div className="lg:grid lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-5 mb-16 lg:mb-0"><div className="bg-white dark:bg-[#1E1E1E] p-8 border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><div className="flex items-start justify-between gap-4 mb-8"><h2 className="text-2xl text-[#121212] dark:text-[#F8F5F0] brand-font transition-colors duration-300">{isEditing ? 'Edit Product' : 'Add New Product'}</h2>{isEditing && <button type="button" onClick={cancelEdit} className="text-[0.6rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Cancel</button>}</div><form key={editingProduct?.id || 'new'} onSubmit={submit} className="space-y-6"><AdminInput label="Product Name" name="name" defaultValue={editingProduct?.name || ''} /><AdminTextArea label="Description" name="description" defaultValue={editingProduct?.description || ''} /><div className="grid grid-cols-2 gap-6"><AdminInput label="Price ($)" name="price" type="number" step="0.01" defaultValue={editingProduct?.price ?? ''} /><AdminInput label="Stock Quantity" name="stock" type="number" defaultValue={editingProduct?.stock_quantity ?? ''} /></div><div><label htmlFor="scent_family" className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Scent Family</label><select name="scent_family" id="scent_family" defaultValue={editingProduct?.scent_family || 'Floral'} className="block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300"><option value="Floral">Floral</option><option value="Woody">Woody</option><option value="Citrus">Citrus</option><option value="Earthy">Earthy</option></select></div><div className="space-y-4 border-t border-[#E5E5E5] dark:border-gray-800 pt-6 transition-colors duration-300"><label className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-colors duration-300">Scent Profile</label><AdminBareInput name="scent_top" placeholder="Top Note" defaultValue={editingProduct?.scent_profile?.top || ''} /><AdminBareInput name="scent_mid" placeholder="Middle Note" defaultValue={editingProduct?.scent_profile?.middle || ''} /><AdminBareInput name="scent_base" placeholder="Base Note" defaultValue={editingProduct?.scent_profile?.base || ''} /></div><AdminInput label="Burn Time" name="burn_time" placeholder="e.g. 40-50 hours" defaultValue={editingProduct?.burn_time || ''} /><AdminImageDropzone resetKey={imageResetKey} initialValue={editingProduct?.image_url || ''} /><button type="submit" className="w-full btn-primary py-4 text-xs uppercase tracking-[0.2em] mt-8 dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">{isEditing ? 'Save Changes' : 'Add Product'}</button></form></div></div>
+        <div className="lg:col-span-5 mb-16 lg:mb-0"><div className="bg-white dark:bg-[#1E1E1E] p-8 border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><div className="flex items-start justify-between gap-4 mb-8"><h2 className="text-2xl text-[#121212] dark:text-[#F8F5F0] brand-font transition-colors duration-300">{isEditing ? 'Edit Product' : 'Add New Product'}</h2>{isEditing && <button type="button" onClick={cancelEdit} className="text-[0.6rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Cancel</button>}</div><form key={editingProduct?.id || 'new'} onSubmit={submit} className="space-y-6"><AdminInput label="Product Name" name="name" defaultValue={editingProduct?.name || ''} /><AdminTextArea label="Description" name="description" defaultValue={editingProduct?.description || ''} /><div className="grid grid-cols-2 gap-6"><AdminInput label="Price ($)" name="price" type="number" step="0.01" defaultValue={editingProduct?.price ?? ''} /><AdminInput label="Stock Quantity" name="stock" type="number" defaultValue={editingProduct?.stock_quantity ?? ''} /></div><AdminScentFamilySelect families={scentFamilies} defaultValue={editingProduct?.scent_family || ''} actions={actions} /><div className="space-y-4 border-t border-[#E5E5E5] dark:border-gray-800 pt-6 transition-colors duration-300"><label className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-colors duration-300">Scent Profile</label><AdminBareInput name="scent_top" placeholder="Top Note" defaultValue={editingProduct?.scent_profile?.top || ''} /><AdminBareInput name="scent_mid" placeholder="Middle Note" defaultValue={editingProduct?.scent_profile?.middle || ''} /><AdminBareInput name="scent_base" placeholder="Base Note" defaultValue={editingProduct?.scent_profile?.base || ''} /></div><AdminInput label="Burn Time" name="burn_time" placeholder="e.g. 40-50 hours" defaultValue={editingProduct?.burn_time || ''} /><AdminImageDropzone resetKey={imageResetKey} initialValue={editingProduct?.image_url || ''} /><button type="submit" className="w-full btn-primary py-4 text-xs uppercase tracking-[0.2em] mt-8 dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">{isEditing ? 'Save Changes' : 'Add Product'}</button></form></div></div>
         <div className="lg:col-span-7"><div className="bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><div className="px-8 py-6 border-b border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide transition-colors duration-300">Inventory</h3></div><ul className="divide-y divide-[#E5E5E5] dark:divide-gray-800 transition-colors duration-300">{products.length ? products.map((product) => <li key={product.id} className={`px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transition-colors ${editingProduct?.id === product.id ? 'bg-[#fcfbf9] dark:bg-[#121212]' : ''}`}><div className="flex items-center min-w-0"><div className="flex-shrink-0 h-16 w-12 bg-[#F8F5F0] dark:bg-[#2A2A2A] flex items-center justify-center overflow-hidden border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300">{product.image_url ? <img src={product.image_url} alt="" className="h-full w-full object-cover" /> : <span className="text-[0.5rem] uppercase tracking-widest text-gray-400">IMG</span>}</div><div className="ml-6 min-w-0"><p className="text-base text-[#121212] dark:text-[#F8F5F0] brand-font mb-1 transition-colors duration-300 truncate">{product.name}</p><p className="text-[0.65rem] text-gray-500 dark:text-gray-400 uppercase tracking-widest transition-colors duration-300">{product.scent_family} | Stock: {product.stock_quantity}</p></div></div><div className="flex items-center justify-between sm:justify-end gap-6"><div className="text-sm text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(product.price)}</div><button type="button" onClick={() => startEdit(product)} className="text-[0.6rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Edit</button></div></li>) : <li className="px-8 py-10 text-center text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest transition-colors duration-300">No products in inventory. Add one to get started.</li>}</ul></div></div>
       </div>
     </div>
@@ -561,6 +584,43 @@ function Footer() {
 
 function Input({ name, type = 'text', placeholder, autoComplete, inputMode }) {
   return <div><label htmlFor={name} className="block mb-2 text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">{placeholder}</label><input id={name} name={name} type={type} required autoComplete={autoComplete} inputMode={inputMode} className="appearance-none block w-full px-4 py-3 border border-[#E5E5E5] dark:border-gray-800 placeholder-gray-400 dark:placeholder-gray-500 text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] focus:ring-0 text-sm tracking-wider bg-[#F8F5F0] dark:bg-[#121212] transition-colors duration-300" placeholder={placeholder} /></div>
+}
+
+function AdminScentFamilySelect({ families, defaultValue, actions }) {
+  const initialValue = defaultValue || families[0] || ''
+  const [selected, setSelected] = useState(initialValue)
+  const [newName, setNewName] = useState('')
+
+  useEffect(() => {
+    setSelected(defaultValue || families[0] || '')
+    setNewName('')
+  }, [defaultValue, families])
+
+  const addFamily = async () => {
+    const createdName = await actions.addScentFamily(newName)
+    if (createdName) {
+      setSelected(createdName)
+      setNewName('')
+    }
+  }
+
+  return (
+    <div>
+      <label htmlFor="scent_family_select" className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Scent Family</label>
+      <select id="scent_family_select" value={selected} onChange={(event) => setSelected(event.target.value)} className="block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300">
+        {!families.length && <option value="">No scent families yet</option>}
+        {families.map((family) => <option key={family} value={family}>{family}</option>)}
+        <option value="__new__">Add new scent family...</option>
+      </select>
+      <input type="hidden" name="scent_family" value={selected === '__new__' ? '' : selected} />
+      {selected === '__new__' && (
+        <div className="mt-3 flex gap-3">
+          <input type="text" value={newName} onChange={(event) => setNewName(event.target.value)} placeholder="New scent family" className="block min-w-0 flex-1 px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300" />
+          <button type="button" onClick={addFamily} className="px-4 py-2 border border-[#121212] dark:border-[#F8F5F0] text-[0.6rem] uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] hover:bg-[#121212] hover:text-white dark:hover:bg-[#F8F5F0] dark:hover:text-[#121212] transition-colors">Add</button>
+        </div>
+      )}
+    </div>
+  )
 }
 
 function AdminInput({ label, name, type = 'text', step, placeholder, required = true, defaultValue = '' }) {

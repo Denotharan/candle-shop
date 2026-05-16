@@ -29,3 +29,7 @@ class ProductIn(BaseModel):
     stock_quantity: int = Field(ge=0)
     image_url: Optional[str] = ""
     scent_profile: ScentProfile
+
+
+class ScentFamilyIn(BaseModel):
+    name: str
