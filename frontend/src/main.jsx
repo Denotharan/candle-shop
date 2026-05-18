@@ -256,7 +256,8 @@ function App() {
   }, [path, query, products, scentFamilies, cart, user, themeTick])
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F8F5F0] dark:bg-[#0a0a0a] text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-transparent text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">
+      <CandlesBackground />
       <Nav user={user} cart={cart} actions={actions} />
       <main className="flex-grow pt-20">
         {messages.length > 0 && (
@@ -283,7 +284,7 @@ function Nav({ user, cart, actions }) {
   const cartCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0)
   const isDark = document.documentElement.classList.contains('dark')
   return (
-    <nav className="fixed w-full top-0 z-50 bg-[#F8F5F0]/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-b border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300">
+    <nav className="fixed w-full top-0 z-50 glass-panel border-b-0 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           <div className="flex items-center space-x-4">
@@ -301,9 +302,9 @@ function Nav({ user, cart, actions }) {
                 <div className="relative group hidden sm:block">
                   <span className="text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] cursor-pointer hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors">{user.name || 'Account'}</span>
                   <div className="absolute right-0 pt-4 hidden group-hover:block">
-                    <div className="bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-gray-800 p-4 min-w-[120px] shadow-lg flex flex-col space-y-3">
+                    <div className="glass-panel p-4 min-w-[120px] rounded-lg shadow-lg flex flex-col space-y-3">
                       {user.is_admin && <Link to="/admin" actions={actions} className="block text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors">Admin</Link>}
-                      <button onClick={actions.logout} className="text-left block text-xs uppercase tracking-widest text-gray-500 hover:text-[#121212] dark:hover:text-[#F8F5F0] transition-colors">Logout</button>
+                      <button onClick={actions.logout} className="text-left block text-xs uppercase tracking-widest text-gray-800 hover:text-[#121212] dark:hover:text-[#F8F5F0] transition-colors">Logout</button>
                     </div>
                   </div>
                 </div>
@@ -331,13 +332,12 @@ function Home({ products, scentFamilies, family, actions }) {
     : 'text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] pb-1 transition-colors'
   return (
     <>
-      <div className="relative w-full h-[80vh] bg-gray-200 dark:bg-gray-800">
-        <div className="absolute inset-0"><img src="/c1.jpg" alt="Luxurious candles" className="w-full h-full object-cover opacity-80" /></div>
-        <div className="absolute inset-0 bg-black/20 dark:bg-black/40"></div>
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-5xl md:text-7xl text-[#F8F5F0] brand-font mb-4 tracking-wider">The Art of Ambiance</h1>
-          <p className="text-sm md:text-base text-[#F8F5F0] uppercase tracking-[0.3em] mb-10 max-w-2xl mx-auto font-light">Hand-poured fragrances for the modern sanctuary</p>
-          <a href="#collection" className="text-[#F8F5F0] uppercase tracking-widest text-xs border-b border-[#F8F5F0] pb-1 hover:text-[#D9B38C] hover:border-[#D9B38C] transition-colors">Shop the Collection</a>
+      <div className="relative w-full min-h-[80vh] flex flex-col items-center justify-center px-4 py-20">
+        <div className="glass-panel p-12 md:p-24 text-center rounded-xl max-w-4xl w-full mx-auto shadow-2xl">
+          <h1 className="text-5xl md:text-7xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-6 tracking-widest transition-colors duration-300">S E R E I N</h1>
+          <div className="w-16 h-[1px] bg-[#D9B38C] mx-auto mb-8"></div>
+          <p className="text-sm md:text-base text-gray-800 dark:text-gray-300 uppercase tracking-[0.3em] mb-12 max-w-2xl mx-auto font-light transition-colors duration-300">The Art of Ambiance</p>
+          <a href="#collection" className="btn-primary inline-block px-10 py-4 text-xs uppercase tracking-[0.2em]">Shop the Collection</a>
         </div>
       </div>
       <div id="collection" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
@@ -354,14 +354,14 @@ function Home({ products, scentFamilies, family, actions }) {
           </div>
         ) : (
           <div className="text-center py-20">
-            <p className="text-gray-500 dark:text-gray-400 uppercase tracking-widest text-sm">No products found in this collection.</p>
+            <p className="text-gray-800 dark:text-gray-400 uppercase tracking-widest text-sm">No products found in this collection.</p>
             <Link to="/" actions={actions} className="inline-block mt-8 text-xs uppercase tracking-widest border-b border-[#121212] dark:border-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] hover:border-[#D9B38C] dark:hover:border-[#D9B38C] transition-colors pb-1 text-[#121212] dark:text-[#F8F5F0]">View all</Link>
           </div>
         )}
       </div>
-      <div className="w-full bg-[#121212] dark:bg-black text-[#F8F5F0] py-24 text-center px-4 transition-colors duration-300">
+      <div className="w-full glass-panel text-[#121212] dark:text-[#F8F5F0] py-24 text-center px-4 transition-colors duration-300 border-x-0 !rounded-none">
         <h2 className="text-3xl md:text-5xl brand-font mb-6 tracking-wide">Crafted with Intention</h2>
-        <p className="text-sm uppercase tracking-widest text-gray-400 max-w-xl mx-auto leading-relaxed">Every candle is meticulously hand-poured using sustainable soy wax and premium botanical oils to elevate your everyday rituals.</p>
+        <p className="text-sm uppercase tracking-widest text-gray-800 dark:text-gray-400 max-w-xl mx-auto leading-relaxed transition-colors duration-300">Every candle is meticulously hand-poured using sustainable soy wax and premium botanical oils to elevate your everyday rituals.</p>
       </div>
     </>
   )
@@ -373,10 +373,10 @@ function ProductCard({ product, actions }) {
       <Link to={`/product/${product.id}`} actions={actions} className="block">
         <ProductImage product={product} className="relative w-full aspect-[3/4] mb-6 overflow-hidden bg-white dark:bg-[#1E1E1E] transition-colors duration-300" imageClass="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000 ease-in-out" fallbackClass="w-full h-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-2xl tracking-widest uppercase transition-colors duration-300" />
         <div className="absolute inset-x-0 bottom-[5.6rem] p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end">
-          <span className="w-full btn-primary block py-3 text-[0.65rem] uppercase tracking-[0.2em] bg-white text-[#121212] border-transparent dark:bg-[#F8F5F0] dark:text-[#121212] hover:bg-[#121212] hover:text-white dark:hover:bg-[#121212] dark:hover:text-[#F8F5F0] dark:hover:border-[#F8F5F0]">View Details</span>
+          <span className="w-full btn-primary block py-3 text-[0.65rem] uppercase tracking-[0.2em]">View Details</span>
         </div>
         <h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-2 transition-colors duration-300">{product.name}</h3>
-        <p className="text-[0.65rem] text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">{product.scent_family}</p>
+        <p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-widest mb-3">{product.scent_family}</p>
         <p className="text-sm text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(product.price)}</p>
       </Link>
     </div>
@@ -390,7 +390,7 @@ function ProductDetail({ product, actions }) {
       <div className="md:grid md:grid-cols-2 md:gap-x-16 lg:gap-x-24">
         <div className="mb-12 md:mb-0"><ProductImage product={product} className="w-full aspect-[3/4] bg-white dark:bg-[#1E1E1E] transition-colors duration-300" imageClass="h-full w-full object-cover object-center" fallbackClass="h-full w-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-4xl tracking-widest uppercase transition-colors duration-300" /></div>
         <div className="flex flex-col justify-center pt-8 md:pt-0">
-          <p className="text-[0.65rem] text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] mb-4">{product.scent_family}</p>
+          <p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-[0.2em] mb-4">{product.scent_family}</p>
           <h1 className="text-4xl md:text-5xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-4 tracking-wide transition-colors duration-300">{product.name}</h1>
           <p className="text-lg text-[#121212] dark:text-[#F8F5F0] mb-10 transition-colors duration-300">{currency(product.price)}</p>
           <div className="text-sm text-gray-600 dark:text-gray-300 font-light leading-relaxed mb-12 transition-colors duration-300"><p>{product.description}</p></div>
@@ -409,7 +409,7 @@ function ProductDetail({ product, actions }) {
               </div>
             </Detail>
           </div>
-          <button onClick={() => actions.addToCart(product.id)} disabled={product.stock_quantity <= 0} className={`w-full btn-primary px-8 py-4 text-xs uppercase tracking-[0.2em] transition-all ${product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed' : ''} dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]`}>{product.stock_quantity > 0 ? 'Add to Bag' : 'Sold Out'}</button>
+          <button onClick={() => actions.addToCart(product.id)} disabled={product.stock_quantity <= 0} className={`w-full btn-primary px-8 py-4 text-xs uppercase tracking-[0.2em] transition-all ${product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}>{product.stock_quantity > 0 ? 'Add to Bag' : 'Sold Out'}</button>
           <TrustBadges />
           <div className="mt-6 text-center"><p className="text-[0.6rem] uppercase tracking-widest text-gray-400 dark:text-gray-500">Free shipping on orders over $100</p></div>
         </div>
@@ -427,7 +427,7 @@ function Cart({ products, cart, actions }) {
       {items.length ? (
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-16">
           <div className="lg:col-span-8">
-            <div className="hidden md:grid grid-cols-6 gap-4 border-b border-[#121212] dark:border-[#F8F5F0] pb-4 mb-8 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-colors duration-300"><div className="col-span-3">Product</div><div className="col-span-1 text-center">Quantity</div><div className="col-span-2 text-right">Total</div></div>
+            <div className="hidden md:grid grid-cols-6 gap-4 border-b border-[#121212] dark:border-[#F8F5F0] pb-4 mb-8 text-xs uppercase tracking-widest text-gray-800 dark:text-gray-400 transition-colors duration-300"><div className="col-span-3">Product</div><div className="col-span-1 text-center">Quantity</div><div className="col-span-2 text-right">Total</div></div>
             <ul className="divide-y divide-[#E5E5E5] dark:divide-gray-800 transition-colors duration-300">
               {items.map(({ product, quantity }) => <CartItem key={product.id} product={product} quantity={quantity} actions={actions} />)}
             </ul>
@@ -436,8 +436,8 @@ function Cart({ products, cart, actions }) {
         </div>
       ) : (
         <div className="text-center py-20 max-w-lg mx-auto">
-          <p className="text-gray-500 dark:text-gray-400 uppercase tracking-widest text-xs mb-8 transition-colors duration-300">Your bag is currently empty.</p>
-          <Link to="/" actions={actions} className="btn-primary inline-block px-10 py-4 text-xs uppercase tracking-[0.2em] dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">Discover Our Scents</Link>
+          <p className="text-gray-800 dark:text-gray-400 uppercase tracking-widest text-xs mb-8 transition-colors duration-300">Your bag is currently empty.</p>
+          <Link to="/" actions={actions} className="btn-primary inline-block px-10 py-4 text-xs uppercase tracking-[0.2em]">Discover Our Scents</Link>
         </div>
       )}
     </div>
@@ -445,24 +445,24 @@ function Cart({ products, cart, actions }) {
 }
 
 function AuthCard({ title, subtitle, children }) {
-  return <div className="min-h-[60vh] flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8"><div className="max-w-lg w-full p-8 sm:p-10 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-gray-800 shadow-[0_18px_60px_rgba(18,18,18,0.08)] dark:shadow-none transition-colors duration-300"><div className="mb-10 text-center"><h2 className="text-3xl brand-font text-[#121212] dark:text-[#F8F5F0] mb-4 transition-colors duration-300">{title}</h2><div className="w-8 h-[1px] bg-[#D9B38C] mx-auto mb-6"></div><p className="text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">{subtitle}</p></div>{children}</div></div>
+  return <div className="min-h-[60vh] flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8"><div className="max-w-lg w-full p-8 sm:p-10 glass-panel rounded-lg shadow-[0_18px_60px_rgba(18,18,18,0.08)] transition-colors duration-300"><div className="mb-10 text-center"><h2 className="text-3xl brand-font text-[#121212] dark:text-[#F8F5F0] mb-4 transition-colors duration-300">{title}</h2><div className="w-8 h-[1px] bg-[#D9B38C] mx-auto mb-6"></div><p className="text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400">{subtitle}</p></div>{children}</div></div>
 }
 
 function AuthMethodSelector({ mode, setMode }) {
   const optionClass = (value) => `flex-1 border px-4 py-4 text-left transition-all duration-300 ${mode === value
     ? 'border-[#121212] dark:border-[#F8F5F0] bg-[#fcfbf9] dark:bg-[#121212] shadow-sm'
-    : 'border-[#E5E5E5] dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:border-[#D9B38C] dark:hover:border-[#D9B38C]'}`
+    : 'border-[#E5E5E5] dark:border-gray-800 text-gray-800 dark:text-gray-400 hover:border-[#D9B38C] dark:hover:border-[#D9B38C]'}`
   return (
     <div className="mb-8">
-      <p className="mb-3 text-[0.65rem] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">Sign in with</p>
+      <p className="mb-3 text-[0.65rem] uppercase tracking-[0.2em] text-gray-800 dark:text-gray-400">Sign in with</p>
       <div className="grid grid-cols-2 gap-3" role="tablist" aria-label="Choose sign in method">
         <button type="button" onClick={() => setMode('email')} className={optionClass('email')} role="tab" aria-selected={mode === 'email'}>
           <span className="block text-xs uppercase tracking-[0.2em] text-[#121212] dark:text-[#F8F5F0]">Email</span>
-          <span className="mt-2 block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">Account address</span>
+          <span className="mt-2 block text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400">Account address</span>
         </button>
         <button type="button" onClick={() => setMode('phone')} className={optionClass('phone')} role="tab" aria-selected={mode === 'phone'}>
           <span className="block text-xs uppercase tracking-[0.2em] text-[#121212] dark:text-[#F8F5F0]">Phone</span>
-          <span className="mt-2 block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">Mobile number</span>
+          <span className="mt-2 block text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400">Mobile number</span>
         </button>
       </div>
     </div>
@@ -485,10 +485,10 @@ function Login({ actions }) {
           : <Input name="identifier" type="tel" placeholder="PHONE NUMBER" autoComplete="tel" inputMode="tel" />
         }
         <Input name="password" type="password" placeholder="PASSWORD" autoComplete="current-password" />
-        <button type="submit" className="w-full flex justify-center py-4 px-4 btn-primary text-xs uppercase tracking-[0.2em] dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">Sign In</button>
+        <button type="submit" className="w-full flex justify-center py-4 px-4 btn-primary text-xs uppercase tracking-[0.2em]">Sign In</button>
       </form>
       <div className="mt-10 text-center">
-        <p className="text-xs tracking-widest text-gray-500 dark:text-gray-400">New to Serein? <Link to="/register" actions={actions} className="text-[#121212] dark:text-[#F8F5F0] border-b border-[#121212] dark:border-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] dark:hover:border-[#D9B38C] transition-colors pb-1">Create an Account</Link></p>
+        <p className="text-xs tracking-widest text-gray-800 dark:text-gray-400">New to Serein? <Link to="/register" actions={actions} className="text-[#121212] dark:text-[#F8F5F0] border-b border-[#121212] dark:border-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] dark:hover:border-[#D9B38C] transition-colors pb-1">Create an Account</Link></p>
       </div>
     </AuthCard>
   )
@@ -511,10 +511,10 @@ function Register({ actions }) {
           : <Input name="identifier" type="tel" placeholder="PHONE NUMBER" autoComplete="tel" inputMode="tel" />
         }
         <Input name="password" type="password" placeholder="PASSWORD" autoComplete="new-password" />
-        <button type="submit" className="w-full flex justify-center py-4 px-4 btn-primary text-xs uppercase tracking-[0.2em] dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">Create Account</button>
+        <button type="submit" className="w-full flex justify-center py-4 px-4 btn-primary text-xs uppercase tracking-[0.2em]">Create Account</button>
       </form>
       <div className="mt-10 text-center">
-        <p className="text-xs tracking-widest text-gray-500 dark:text-gray-400">Already have an account? <Link to="/login" actions={actions} className="text-[#121212] dark:text-[#F8F5F0] border-b border-[#121212] dark:border-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] dark:hover:border-[#D9B38C] transition-colors pb-1">Sign In</Link></p>
+        <p className="text-xs tracking-widest text-gray-800 dark:text-gray-400">Already have an account? <Link to="/login" actions={actions} className="text-[#121212] dark:text-[#F8F5F0] border-b border-[#121212] dark:border-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] dark:hover:border-[#D9B38C] transition-colors pb-1">Sign In</Link></p>
       </div>
     </AuthCard>
   )
@@ -545,17 +545,17 @@ function Admin({ products, scentFamilies, actions }) {
   }
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <div className="flex justify-between items-center mb-16 border-b border-[#E5E5E5] dark:border-gray-800 pb-6 transition-colors duration-300"><h1 className="text-4xl text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide transition-colors duration-300">Admin Dashboard</h1><button onClick={actions.logout} className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Logout</button></div>
+      <div className="flex justify-between items-center mb-16 border-b border-[#E5E5E5] dark:border-gray-800 pb-6 transition-colors duration-300"><h1 className="text-4xl text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide transition-colors duration-300">Admin Dashboard</h1><button onClick={actions.logout} className="text-xs uppercase tracking-widest text-gray-800 dark:text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Logout</button></div>
       <div className="lg:grid lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-5 mb-16 lg:mb-0"><div className="bg-white dark:bg-[#1E1E1E] p-8 border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><div className="flex items-start justify-between gap-4 mb-8"><h2 className="text-2xl text-[#121212] dark:text-[#F8F5F0] brand-font transition-colors duration-300">{isEditing ? 'Edit Product' : 'Add New Product'}</h2>{isEditing && <button type="button" onClick={cancelEdit} className="text-[0.6rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Cancel</button>}</div><form key={editingProduct?.id || 'new'} onSubmit={submit} className="space-y-6"><AdminInput label="Product Name" name="name" defaultValue={editingProduct?.name || ''} /><AdminTextArea label="Description" name="description" defaultValue={editingProduct?.description || ''} /><div className="grid grid-cols-2 gap-6"><AdminInput label="Price ($)" name="price" type="number" step="0.01" defaultValue={editingProduct?.price ?? ''} /><AdminInput label="Stock Quantity" name="stock" type="number" defaultValue={editingProduct?.stock_quantity ?? ''} /></div><AdminScentFamilySelect families={scentFamilies} defaultValue={editingProduct?.scent_family || ''} actions={actions} /><div className="space-y-4 border-t border-[#E5E5E5] dark:border-gray-800 pt-6 transition-colors duration-300"><label className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-colors duration-300">Scent Profile</label><AdminBareInput name="scent_top" placeholder="Top Note" defaultValue={editingProduct?.scent_profile?.top || ''} /><AdminBareInput name="scent_mid" placeholder="Middle Note" defaultValue={editingProduct?.scent_profile?.middle || ''} /><AdminBareInput name="scent_base" placeholder="Base Note" defaultValue={editingProduct?.scent_profile?.base || ''} /></div><AdminInput label="Burn Time" name="burn_time" placeholder="e.g. 40-50 hours" defaultValue={editingProduct?.burn_time || ''} /><AdminImageDropzone resetKey={imageResetKey} initialValue={editingProduct?.image_url || ''} /><button type="submit" className="w-full btn-primary py-4 text-xs uppercase tracking-[0.2em] mt-8 dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">{isEditing ? 'Save Changes' : 'Add Product'}</button></form></div></div>
-        <div className="lg:col-span-7"><div className="bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><div className="px-8 py-6 border-b border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide transition-colors duration-300">Inventory</h3></div><ul className="divide-y divide-[#E5E5E5] dark:divide-gray-800 transition-colors duration-300">{products.length ? products.map((product) => <li key={product.id} className={`px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transition-colors ${editingProduct?.id === product.id ? 'bg-[#fcfbf9] dark:bg-[#121212]' : ''}`}><div className="flex items-center min-w-0"><div className="flex-shrink-0 h-16 w-12 bg-[#F8F5F0] dark:bg-[#2A2A2A] flex items-center justify-center overflow-hidden border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300">{product.image_url ? <img src={product.image_url} alt="" className="h-full w-full object-cover" /> : <span className="text-[0.5rem] uppercase tracking-widest text-gray-400">IMG</span>}</div><div className="ml-6 min-w-0"><p className="text-base text-[#121212] dark:text-[#F8F5F0] brand-font mb-1 transition-colors duration-300 truncate">{product.name}</p><p className="text-[0.65rem] text-gray-500 dark:text-gray-400 uppercase tracking-widest transition-colors duration-300">{product.scent_family} | Stock: {product.stock_quantity}</p></div></div><div className="flex items-center justify-between sm:justify-end gap-6"><div className="text-sm text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(product.price)}</div><button type="button" onClick={() => startEdit(product)} className="text-[0.6rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Edit</button></div></li>) : <li className="px-8 py-10 text-center text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest transition-colors duration-300">No products in inventory. Add one to get started.</li>}</ul></div></div>
+        <div className="lg:col-span-5 mb-16 lg:mb-0"><div className="glass-panel rounded-lg p-8 transition-colors duration-300"><div className="flex items-start justify-between gap-4 mb-8"><h2 className="text-2xl text-[#121212] dark:text-[#F8F5F0] brand-font transition-colors duration-300">{isEditing ? 'Edit Product' : 'Add New Product'}</h2>{isEditing && <button type="button" onClick={cancelEdit} className="text-[0.6rem] uppercase tracking-widest text-gray-800 dark:text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Cancel</button>}</div><form key={editingProduct?.id || 'new'} onSubmit={submit} className="space-y-6"><AdminInput label="Product Name" name="name" defaultValue={editingProduct?.name || ''} /><AdminTextArea label="Description" name="description" defaultValue={editingProduct?.description || ''} /><div className="grid grid-cols-2 gap-6"><AdminInput label="Price ($)" name="price" type="number" step="0.01" defaultValue={editingProduct?.price ?? ''} /><AdminInput label="Stock Quantity" name="stock" type="number" defaultValue={editingProduct?.stock_quantity ?? ''} /></div><AdminScentFamilySelect families={scentFamilies} defaultValue={editingProduct?.scent_family || ''} actions={actions} /><div className="space-y-4 border-t border-[#E5E5E5] dark:border-gray-800 pt-6 transition-colors duration-300"><label className="block text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400 transition-colors duration-300">Scent Profile</label><AdminBareInput name="scent_top" placeholder="Top Note" defaultValue={editingProduct?.scent_profile?.top || ''} /><AdminBareInput name="scent_mid" placeholder="Middle Note" defaultValue={editingProduct?.scent_profile?.middle || ''} /><AdminBareInput name="scent_base" placeholder="Base Note" defaultValue={editingProduct?.scent_profile?.base || ''} /></div><AdminInput label="Burn Time" name="burn_time" placeholder="e.g. 40-50 hours" defaultValue={editingProduct?.burn_time || ''} /><AdminImageDropzone resetKey={imageResetKey} initialValue={editingProduct?.image_url || ''} /><button type="submit" className="w-full btn-primary py-4 text-xs uppercase tracking-[0.2em] mt-8">{isEditing ? 'Save Changes' : 'Add Product'}</button></form></div></div>
+        <div className="lg:col-span-7"><div className="glass-panel rounded-lg overflow-hidden transition-colors duration-300"><div className="px-8 py-6 border-b border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide transition-colors duration-300">Inventory</h3></div><ul className="divide-y divide-[#E5E5E5] dark:divide-gray-800 transition-colors duration-300">{products.length ? products.map((product) => <li key={product.id} className={`px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transition-colors ${editingProduct?.id === product.id ? 'bg-[#fcfbf9] dark:bg-[#121212]' : ''}`}><div className="flex items-center min-w-0"><div className="flex-shrink-0 h-16 w-12 bg-[#F8F5F0] dark:bg-[#2A2A2A] flex items-center justify-center overflow-hidden border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300">{product.image_url ? <img src={product.image_url} alt="" className="h-full w-full object-cover" /> : <span className="text-[0.5rem] uppercase tracking-widest text-gray-400">IMG</span>}</div><div className="ml-6 min-w-0"><p className="text-base text-[#121212] dark:text-[#F8F5F0] brand-font mb-1 transition-colors duration-300 truncate">{product.name}</p><p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-widest transition-colors duration-300">{product.scent_family} | Stock: {product.stock_quantity}</p></div></div><div className="flex items-center justify-between sm:justify-end gap-6"><div className="text-sm text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(product.price)}</div><button type="button" onClick={() => startEdit(product)} className="text-[0.6rem] uppercase tracking-widest text-gray-800 dark:text-gray-400 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Edit</button></div></li>) : <li className="px-8 py-10 text-center text-gray-800 dark:text-gray-400 text-xs uppercase tracking-widest transition-colors duration-300">No products in inventory. Add one to get started.</li>}</ul></div></div>
       </div>
     </div>
   )
 }
 
 function Success({ actions }) {
-  return <div className="min-h-[60vh] flex flex-col items-center justify-center py-20 px-4 sm:px-6 lg:px-8 text-center"><div className="bg-white dark:bg-[#1E1E1E] p-16 border border-[#E5E5E5] dark:border-gray-800 max-w-lg w-full transition-colors duration-300"><h2 className="text-4xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-6 tracking-wide transition-colors duration-300">Thank You</h2><div className="w-12 h-[1px] bg-[#D9B38C] mx-auto mb-8"></div><p className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-loose mb-12 transition-colors duration-300">Your order has been confirmed. We are preparing your artisanal candles and will notify you when they ship.</p><Link to="/" actions={actions} className="btn-primary inline-block px-10 py-4 text-xs uppercase tracking-[0.2em] dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">Return to Collection</Link></div></div>
+  return <div className="min-h-[60vh] flex flex-col items-center justify-center py-20 px-4 sm:px-6 lg:px-8 text-center"><div className="glass-panel rounded-lg p-16 max-w-lg w-full transition-colors duration-300"><h2 className="text-4xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-6 tracking-wide transition-colors duration-300">Thank You</h2><div className="w-12 h-[1px] bg-[#D9B38C] mx-auto mb-8"></div><p className="text-sm text-gray-800 dark:text-gray-400 uppercase tracking-widest leading-loose mb-12 transition-colors duration-300">Your order has been confirmed. We are preparing your artisanal candles and will notify you when they ship.</p><Link to="/" actions={actions} className="btn-primary inline-block px-10 py-4 text-xs uppercase tracking-[0.2em]">Return to Collection</Link></div></div>
 }
 
 function ProductImage({ product, className, imageClass, fallbackClass }) {
@@ -563,7 +563,7 @@ function ProductImage({ product, className, imageClass, fallbackClass }) {
 }
 
 function Detail({ title, children }) {
-  return <details className="group border-b border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><summary className="flex justify-between items-center font-semibold cursor-pointer list-none py-6 text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300"><span>{title}</span><span className="transition group-open:rotate-180"><ChevronIcon /></span></summary><div className="pb-6 text-xs tracking-wider text-gray-500 dark:text-gray-400 group-open:animate-fadeIn">{children}</div></details>
+  return <details className="group border-b border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><summary className="flex justify-between items-center font-semibold cursor-pointer list-none py-6 text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300"><span>{title}</span><span className="transition group-open:rotate-180"><ChevronIcon /></span></summary><div className="pb-6 text-xs tracking-wider text-gray-800 dark:text-gray-400 group-open:animate-fadeIn">{children}</div></details>
 }
 
 function Info({ label, value }) {
@@ -571,11 +571,11 @@ function Info({ label, value }) {
 }
 
 function CartItem({ product, quantity, actions }) {
-  return <li className="py-8 flex flex-col md:flex-row md:items-center"><div className="flex flex-1 md:col-span-3 items-center mb-6 md:mb-0"><ProductImage product={product} className="flex-shrink-0 w-24 h-32 bg-white dark:bg-[#1E1E1E] transition-colors duration-300" imageClass="w-full h-full object-cover" fallbackClass="w-full h-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-xs uppercase transition-colors duration-300" /><div className="ml-6 flex flex-col justify-center"><h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-1 transition-colors duration-300"><Link to={`/product/${product.id}`} actions={actions} className="hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors">{product.name}</Link></h3><p className="text-[0.65rem] text-gray-500 dark:text-gray-400 uppercase tracking-widest transition-colors duration-300">{product.scent_family}</p></div></div><div className="flex justify-between items-center md:flex-1 md:grid md:grid-cols-3 md:gap-4 w-full"><div className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 md:text-center md:col-span-1 transition-colors duration-300"><span className="md:hidden">Qty: </span>{quantity}</div><div className="text-sm text-[#121212] dark:text-[#F8F5F0] md:text-right md:col-span-2 flex justify-between items-center w-full md:w-auto md:justify-end transition-colors duration-300"><span className="md:mr-8">{currency(product.price * quantity)}</span><button onClick={() => actions.removeFromCart(product.id)} className="text-[0.6rem] uppercase tracking-widest text-gray-400 dark:text-gray-500 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-0.5">Remove</button></div></div></li>
+  return <li className="py-8 flex flex-col md:flex-row md:items-center"><div className="flex flex-1 md:col-span-3 items-center mb-6 md:mb-0"><ProductImage product={product} className="flex-shrink-0 w-24 h-32 bg-white dark:bg-[#1E1E1E] transition-colors duration-300" imageClass="w-full h-full object-cover" fallbackClass="w-full h-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-xs uppercase transition-colors duration-300" /><div className="ml-6 flex flex-col justify-center"><h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-1 transition-colors duration-300"><Link to={`/product/${product.id}`} actions={actions} className="hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors">{product.name}</Link></h3><p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-widest transition-colors duration-300">{product.scent_family}</p></div></div><div className="flex justify-between items-center md:flex-1 md:grid md:grid-cols-3 md:gap-4 w-full"><div className="text-xs uppercase tracking-widest text-gray-800 dark:text-gray-400 md:text-center md:col-span-1 transition-colors duration-300"><span className="md:hidden">Qty: </span>{quantity}</div><div className="text-sm text-[#121212] dark:text-[#F8F5F0] md:text-right md:col-span-2 flex justify-between items-center w-full md:w-auto md:justify-end transition-colors duration-300"><span className="md:mr-8">{currency(product.price * quantity)}</span><button onClick={() => actions.removeFromCart(product.id)} className="text-[0.6rem] uppercase tracking-widest text-gray-400 dark:text-gray-800 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-0.5">Remove</button></div></div></li>
 }
 
 function OrderSummary({ total, actions }) {
-  return <div className="bg-[#fcfbf9] dark:bg-[#121212] p-8 border border-[#E5E5E5] dark:border-gray-800 transition-colors duration-300"><h2 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-8 border-b border-[#E5E5E5] dark:border-gray-800 pb-4 transition-colors duration-300">Order Summary</h2><dl className="space-y-4 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-colors duration-300"><div className="flex items-center justify-between"><dt>Subtotal</dt><dd className="text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(total)}</dd></div><div className="flex items-center justify-between"><dt>Shipping</dt><dd className="text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">Calculated at checkout</dd></div><div className="flex items-center justify-between border-t border-[#E5E5E5] dark:border-gray-800 pt-6 mt-6 transition-colors duration-300"><dt className="text-sm font-bold text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">Total</dt><dd className="text-sm font-bold text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(total)}</dd></div></dl><div className="mt-10"><button onClick={actions.checkout} className="w-full btn-primary py-4 text-xs uppercase tracking-[0.2em] dark:bg-[#F8F5F0] dark:text-[#121212] dark:border-[#F8F5F0] dark:hover:bg-transparent dark:hover:text-[#F8F5F0]">Checkout Securely</button></div><div className="mt-6 text-center"><Link to="/" actions={actions} className="text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 border-b border-gray-300 dark:border-gray-600 hover:text-[#121212] dark:hover:text-[#F8F5F0] hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Continue Shopping</Link></div></div>
+  return <div className="glass-panel rounded-lg p-8 transition-colors duration-300"><h2 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-8 border-b border-[#E5E5E5] dark:border-gray-800 pb-4 transition-colors duration-300">Order Summary</h2><dl className="space-y-4 text-xs uppercase tracking-widest text-gray-800 dark:text-gray-400 transition-colors duration-300"><div className="flex items-center justify-between"><dt>Subtotal</dt><dd className="text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(total)}</dd></div><div className="flex items-center justify-between"><dt>Shipping</dt><dd className="text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">Calculated at checkout</dd></div><div className="flex items-center justify-between border-t border-[#E5E5E5] dark:border-gray-800 pt-6 mt-6 transition-colors duration-300"><dt className="text-sm font-bold text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">Total</dt><dd className="text-sm font-bold text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(total)}</dd></div></dl><div className="mt-10"><button onClick={actions.checkout} className="w-full btn-primary py-4 text-xs uppercase tracking-[0.2em]">Checkout Securely</button></div><div className="mt-6 text-center"><Link to="/" actions={actions} className="text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400 border-b border-gray-300 dark:border-gray-600 hover:text-[#121212] dark:hover:text-[#F8F5F0] hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Continue Shopping</Link></div></div>
 }
 
 function Footer() {
@@ -583,7 +583,7 @@ function Footer() {
 }
 
 function Input({ name, type = 'text', placeholder, autoComplete, inputMode }) {
-  return <div><label htmlFor={name} className="block mb-2 text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">{placeholder}</label><input id={name} name={name} type={type} required autoComplete={autoComplete} inputMode={inputMode} className="appearance-none block w-full px-4 py-3 border border-[#E5E5E5] dark:border-gray-800 placeholder-gray-400 dark:placeholder-gray-500 text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] focus:ring-0 text-sm tracking-wider bg-[#F8F5F0] dark:bg-[#121212] transition-colors duration-300" placeholder={placeholder} /></div>
+  return <div><label htmlFor={name} className="block mb-2 text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400">{placeholder}</label><input id={name} name={name} type={type} required autoComplete={autoComplete} inputMode={inputMode} className="appearance-none block w-full px-4 py-3 border border-[#E5E5E5] dark:border-gray-800 placeholder-gray-600 dark:placeholder-gray-500 text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] focus:ring-0 text-sm tracking-wider bg-[#F8F5F0] dark:bg-[#121212] transition-colors duration-300" placeholder={placeholder} /></div>
 }
 
 function AdminScentFamilySelect({ families, defaultValue, actions }) {
@@ -606,7 +606,7 @@ function AdminScentFamilySelect({ families, defaultValue, actions }) {
 
   return (
     <div>
-      <label htmlFor="scent_family_select" className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Scent Family</label>
+      <label htmlFor="scent_family_select" className="block text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400 mb-2 transition-colors duration-300">Scent Family</label>
       <select id="scent_family_select" value={selected} onChange={(event) => setSelected(event.target.value)} className="block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300">
         {!families.length && <option value="">No scent families yet</option>}
         {families.map((family) => <option key={family} value={family}>{family}</option>)}
@@ -615,7 +615,7 @@ function AdminScentFamilySelect({ families, defaultValue, actions }) {
       <input type="hidden" name="scent_family" value={selected === '__new__' ? '' : selected} />
       {selected === '__new__' && (
         <div className="mt-3 flex gap-3">
-          <input type="text" value={newName} onChange={(event) => setNewName(event.target.value)} placeholder="New scent family" className="block min-w-0 flex-1 px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300" />
+          <input type="text" value={newName} onChange={(event) => setNewName(event.target.value)} placeholder="New scent family" className="block min-w-0 flex-1 px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] placeholder-gray-600 dark:placeholder-gray-500 focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300" />
           <button type="button" onClick={addFamily} className="px-4 py-2 border border-[#121212] dark:border-[#F8F5F0] text-[0.6rem] uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] hover:bg-[#121212] hover:text-white dark:hover:bg-[#F8F5F0] dark:hover:text-[#121212] transition-colors">Add</button>
         </div>
       )}
@@ -624,11 +624,11 @@ function AdminScentFamilySelect({ families, defaultValue, actions }) {
 }
 
 function AdminInput({ label, name, type = 'text', step, placeholder, required = true, defaultValue = '' }) {
-  return <div><label htmlFor={name} className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">{label}</label><input type={type} step={step} name={name} id={name} required={required} placeholder={placeholder} defaultValue={defaultValue} className="block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300" /></div>
+  return <div><label htmlFor={name} className="block text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400 mb-2 transition-colors duration-300">{label}</label><input type={type} step={step} name={name} id={name} required={required} placeholder={placeholder} defaultValue={defaultValue} className="block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300" /></div>
 }
 
 function AdminTextArea({ label, name, defaultValue = '' }) {
-  return <div><label htmlFor={name} className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">{label}</label><textarea name={name} id={name} rows="3" required defaultValue={defaultValue} className="block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300"></textarea></div>
+  return <div><label htmlFor={name} className="block text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400 mb-2 transition-colors duration-300">{label}</label><textarea name={name} id={name} rows="3" required defaultValue={defaultValue} className="block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300"></textarea></div>
 }
 
 function AdminBareInput({ name, placeholder, defaultValue = '' }) {
@@ -659,7 +659,7 @@ function AdminImageDropzone({ resetKey, initialValue = '' }) {
 
   return (
     <div>
-      <label htmlFor="image_url" className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Image URL</label>
+      <label htmlFor="image_url" className="block text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400 mb-2 transition-colors duration-300">Image URL</label>
       <div
         onDragOver={(event) => { event.preventDefault(); setIsDragging(true) }}
         onDragLeave={() => setIsDragging(false)}
@@ -672,7 +672,7 @@ function AdminImageDropzone({ resetKey, initialValue = '' }) {
           ) : (
             <div className="mx-auto mb-4 h-36 w-28 bg-white dark:bg-[#1E1E1E] border border-[#E5E5E5] dark:border-gray-800 flex items-center justify-center text-[#D9B38C] brand-font text-xl tracking-widest uppercase">Serein</div>
           )}
-          <span className="block text-[0.65rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">Drop image here or click to choose</span>
+          <span className="block text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400">Drop image here or click to choose</span>
         </label>
         <input id="product-image-file" type="file" accept="image/*" className="sr-only" onChange={(event) => useFile(event.target.files?.[0])} />
       </div>
@@ -684,7 +684,7 @@ function AdminImageDropzone({ resetKey, initialValue = '' }) {
         value={imageValue}
         onChange={(event) => setImageValue(event.target.value)}
         placeholder="PASTE IMAGE URL"
-        className="mt-3 block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300"
+        className="mt-3 block w-full px-3 py-2 border border-[#E5E5E5] dark:border-gray-800 bg-[#F8F5F0] dark:bg-[#121212] text-sm text-[#121212] dark:text-[#F8F5F0] placeholder-gray-600 dark:placeholder-gray-500 focus:outline-none focus:border-[#121212] dark:focus:border-[#F8F5F0] transition-colors duration-300"
       />
     </div>
   )
@@ -697,7 +697,7 @@ function TrustBadges() {
 }
 
 function Badge({ icon, text }) {
-  return <div className="flex flex-col items-center"><span className="w-6 h-6 mb-2 text-[#121212] dark:text-[#F8F5F0]">{icon}</span><span className="text-[0.55rem] uppercase tracking-widest text-gray-500 dark:text-gray-400">{text}</span></div>
+  return <div className="flex flex-col items-center"><span className="w-6 h-6 mb-2 text-[#121212] dark:text-[#F8F5F0]">{icon}</span><span className="text-[0.55rem] uppercase tracking-widest text-gray-800 dark:text-gray-400">{text}</span></div>
 }
 
 function SunIcon() { return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> }
@@ -708,5 +708,13 @@ function ChevronIcon() { return <svg fill="none" height="24" shapeRendering="geo
 function PaletteIcon() { return <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg> }
 function HeartIcon() { return <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg> }
 
+function CandlesBackground() {
+  return (
+    <>
+      <div className="fixed inset-0 z-[-1] transition-opacity duration-1000 ease-in-out opacity-100 dark:opacity-0 bg-cover bg-center bg-no-repeat bg-[#F8F5F0]" style={{ backgroundImage: "url('/candles_light.png')" }}></div>
+      <div className="fixed inset-0 z-[-1] transition-opacity duration-1000 ease-in-out opacity-0 dark:opacity-100 bg-cover bg-center bg-no-repeat bg-[#0a0a0a]" style={{ backgroundImage: "url('/candles_dark.png')" }}></div>
+    </>
+  )
+}
 
 createRoot(document.getElementById('root')).render(<App />)
