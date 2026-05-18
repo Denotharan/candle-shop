@@ -344,7 +344,7 @@ function Home({ products, scentFamilies, family, actions }) {
         <div className="text-center mb-16">
           <h2 className="text-4xl brand-font text-[#121212] dark:text-[#F8F5F0] mb-4 transition-colors duration-300">Curated Scents</h2>
           <div className="w-12 h-[1px] bg-[#D9B38C] mx-auto mb-10"></div>
-          <div className="flex flex-wrap justify-center gap-6 text-xs uppercase tracking-widest">
+          <div className="glass-panel inline-flex flex-wrap justify-center gap-6 text-xs uppercase tracking-widest px-8 py-5 rounded-2xl shadow-sm">
             {[null, ...families].map((item) => <Link key={item || 'All'} actions={actions} to={item ? `/?family=${encodeURIComponent(item)}` : '/'} preserveScroll className={familyClass(item)}>{item || 'All'}</Link>)}
           </div>
         </div>
