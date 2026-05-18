@@ -359,9 +359,9 @@ function Home({ products, scentFamilies, family, actions }) {
           </div>
         )}
       </div>
-      <div className="w-full bg-[#121212] dark:bg-black text-[#F8F5F0] py-24 text-center px-4 transition-colors duration-300">
+      <div className="w-full glass-panel text-[#121212] dark:text-[#F8F5F0] py-24 text-center px-4 transition-colors duration-300 border-x-0 !rounded-none">
         <h2 className="text-3xl md:text-5xl brand-font mb-6 tracking-wide">Crafted with Intention</h2>
-        <p className="text-sm uppercase tracking-widest text-gray-400 max-w-xl mx-auto leading-relaxed">Every candle is meticulously hand-poured using sustainable soy wax and premium botanical oils to elevate your everyday rituals.</p>
+        <p className="text-sm uppercase tracking-widest text-gray-800 dark:text-gray-400 max-w-xl mx-auto leading-relaxed transition-colors duration-300">Every candle is meticulously hand-poured using sustainable soy wax and premium botanical oils to elevate your everyday rituals.</p>
       </div>
     </>
   )
