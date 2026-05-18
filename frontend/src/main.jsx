@@ -371,13 +371,17 @@ function ProductCard({ product, actions }) {
   return (
     <div className="group relative block text-center">
       <Link to={`/product/${product.id}`} actions={actions} className="block">
-        <ProductImage product={product} className="relative w-full aspect-[3/4] mb-6 overflow-hidden bg-white dark:bg-[#1E1E1E] transition-colors duration-300" imageClass="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000 ease-in-out" fallbackClass="w-full h-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-2xl tracking-widest uppercase transition-colors duration-300" />
-        <div className="absolute inset-x-0 bottom-[5.6rem] p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end">
-          <span className="w-full btn-primary block py-3 text-[0.65rem] uppercase tracking-[0.2em]">View Details</span>
+        <div className="relative mb-4">
+          <ProductImage product={product} className="relative w-full aspect-[3/4] overflow-hidden bg-white dark:bg-[#1E1E1E] transition-colors duration-300 rounded-lg shadow-sm" imageClass="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000 ease-in-out" fallbackClass="w-full h-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-2xl tracking-widest uppercase transition-colors duration-300" />
+          <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end">
+            <span className="w-full btn-primary block py-3 text-[0.65rem] uppercase tracking-[0.2em] rounded-b-lg">View Details</span>
+          </div>
         </div>
-        <h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-2 transition-colors duration-300">{product.name}</h3>
-        <p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-widest mb-3">{product.scent_family}</p>
-        <p className="text-sm text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(product.price)}</p>
+        <div className="glass-panel py-4 px-2 rounded-lg">
+          <h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-1 transition-colors duration-300">{product.name}</h3>
+          <p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-widest mb-2">{product.scent_family}</p>
+          <p className="text-sm text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(product.price)}</p>
+        </div>
       </Link>
     </div>
   )
