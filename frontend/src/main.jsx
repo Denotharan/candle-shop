@@ -405,31 +405,39 @@ function ProductDetail({ product, actions }) {
   if (!product) return <div className="text-center py-32 text-xs uppercase tracking-widest text-gray-500">Product not found.</div>
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-      <div className="md:grid md:grid-cols-2 md:gap-x-16 lg:gap-x-24">
-        <div className="mb-12 md:mb-0"><ProductImage product={product} className="w-full aspect-[3/4] bg-white dark:bg-[#1E1E1E] transition-colors duration-300" imageClass="h-full w-full object-cover object-center" fallbackClass="h-full w-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-4xl tracking-widest uppercase transition-colors duration-300" /></div>
-        <div className="flex flex-col justify-center pt-8 md:pt-0">
-          <p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-[0.2em] mb-4">{product.scent_family}</p>
-          <h1 className="text-4xl md:text-5xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-4 tracking-wide transition-colors duration-300">{product.name}</h1>
-          <p className="text-lg text-[#121212] dark:text-[#F8F5F0] mb-10 transition-colors duration-300">{currency(product.price)}</p>
-          <div className="text-sm text-gray-600 dark:text-gray-300 font-light leading-relaxed mb-12 transition-colors duration-300"><p>{product.description}</p></div>
-          <div className="border-t border-[#E5E5E5] dark:border-gray-800 mb-10 transition-colors duration-300">
-            <Detail title="Scent Profile">
-              <div className="grid grid-cols-1 gap-y-4">
-                <Info label="Top" value={product.scent_profile?.top || 'N/A'} />
-                <Info label="Heart" value={product.scent_profile?.middle || 'N/A'} />
-                <Info label="Base" value={product.scent_profile?.base || 'N/A'} />
-              </div>
-            </Detail>
-            <Detail title="Product Details">
-              <div className="space-y-3">
-                <Info label="Burn Time" value={product.burn_time} />
-                <div className="flex justify-between"><span className="uppercase">Availability</span><span className={product.stock_quantity > 0 ? 'text-[#121212] dark:text-[#F8F5F0]' : 'text-red-400 dark:text-red-400'}>{product.stock_quantity > 0 ? 'In Stock' : 'Sold Out'}</span></div>
-              </div>
-            </Detail>
+      <div className="md:grid md:grid-cols-2 md:gap-x-12 lg:gap-x-20 items-center">
+        <div className="mb-12 md:mb-0 relative group max-w-sm lg:max-w-md mx-auto w-full">
+          <div className="absolute -inset-4 bg-[#D9B38C]/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
+          <ProductImage product={product} className="relative w-full aspect-[3/4] bg-white dark:bg-[#1E1E1E] transition-colors duration-300 rounded-2xl overflow-hidden shadow-xl" imageClass="h-full w-full object-cover object-center" fallbackClass="h-full w-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-4xl tracking-widest uppercase transition-colors duration-300" />
+        </div>
+        <div className="flex flex-col justify-center glass-panel p-8 sm:p-12 lg:p-16 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-colors duration-300 relative overflow-hidden mt-8 md:mt-0">
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#D9B38C]/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[#D9B38C]/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="relative z-10">
+            <p className="text-[0.65rem] text-[#D9B38C] uppercase tracking-[0.3em] mb-4 font-medium">{product.scent_family}</p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-4 tracking-wide transition-colors duration-300 leading-tight">{product.name}</h1>
+            <p className="text-2xl text-[#121212] dark:text-[#F8F5F0] mb-8 transition-colors duration-300 font-light">{currency(product.price)}</p>
+            <div className="w-16 h-[1px] bg-[#D9B38C] mb-8"></div>
+            <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-light leading-relaxed mb-10 transition-colors duration-300"><p>{product.description}</p></div>
+            <div className="border-t border-[#E5E5E5] dark:border-gray-800 mb-10 transition-colors duration-300">
+              <Detail title="Scent Profile">
+                <div className="grid grid-cols-1 gap-y-4">
+                  <Info label="Top" value={product.scent_profile?.top || 'N/A'} />
+                  <Info label="Heart" value={product.scent_profile?.middle || 'N/A'} />
+                  <Info label="Base" value={product.scent_profile?.base || 'N/A'} />
+                </div>
+              </Detail>
+              <Detail title="Product Details">
+                <div className="space-y-3">
+                  <Info label="Burn Time" value={product.burn_time} />
+                  <div className="flex justify-between"><span className="uppercase text-xs tracking-widest text-gray-800 dark:text-gray-400">Availability</span><span className={product.stock_quantity > 0 ? 'text-[#121212] dark:text-[#F8F5F0] text-xs uppercase tracking-widest' : 'text-red-400 dark:text-red-400 text-xs uppercase tracking-widest'}>{product.stock_quantity > 0 ? 'In Stock' : 'Sold Out'}</span></div>
+                </div>
+              </Detail>
+            </div>
+            <button onClick={() => actions.addToCart(product.id)} disabled={product.stock_quantity <= 0} className={`w-full btn-primary px-8 py-5 text-xs uppercase tracking-[0.2em] transition-all duration-500 hover:shadow-xl hover:-translate-y-1 ${product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed hover:shadow-none hover:translate-y-0' : ''}`}>{product.stock_quantity > 0 ? 'Add to Bag' : 'Sold Out'}</button>
+            <TrustBadges />
+            <div className="mt-8 text-center"><p className="text-[0.65rem] uppercase tracking-[0.15em] text-gray-500 dark:text-gray-400">Complimentary shipping on orders over $100</p></div>
           </div>
-          <button onClick={() => actions.addToCart(product.id)} disabled={product.stock_quantity <= 0} className={`w-full btn-primary px-8 py-4 text-xs uppercase tracking-[0.2em] transition-all ${product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}>{product.stock_quantity > 0 ? 'Add to Bag' : 'Sold Out'}</button>
-          <TrustBadges />
-          <div className="mt-6 text-center"><p className="text-[0.6rem] uppercase tracking-widest text-gray-400 dark:text-gray-500">Free shipping on orders over $100</p></div>
         </div>
       </div>
     </div>
