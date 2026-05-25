@@ -165,6 +165,20 @@ function App() {
         flash(error.message)
       }
     },
+    async increaseQuantity(productId) {
+      try {
+        setCart(await api(`/cart/items/${productId}`, { method: 'POST' }))
+      } catch (error) {
+        flash(error.message)
+      }
+    },
+    async decreaseQuantity(productId) {
+      try {
+        setCart(await api(`/cart/items/${productId}/decrease`, { method: 'PUT' }))
+      } catch (error) {
+        flash(error.message)
+      }
+    },
     async checkout() {
       if (!Object.keys(cart).length) {
         flash('Your cart is empty.')
@@ -575,7 +589,29 @@ function Info({ label, value }) {
 }
 
 function CartItem({ product, quantity, actions }) {
-  return <li className="py-8 flex flex-col md:flex-row md:items-center"><div className="flex flex-1 md:col-span-3 items-center mb-6 md:mb-0"><ProductImage product={product} className="flex-shrink-0 w-24 h-32 bg-white dark:bg-[#1E1E1E] transition-colors duration-300" imageClass="w-full h-full object-cover" fallbackClass="w-full h-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-xs uppercase transition-colors duration-300" /><div className="ml-6 flex flex-col justify-center"><h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-1 transition-colors duration-300"><Link to={`/product/${product.id}`} actions={actions} className="hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors">{product.name}</Link></h3><p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-widest transition-colors duration-300">{product.scent_family}</p></div></div><div className="flex justify-between items-center md:flex-1 md:grid md:grid-cols-3 md:gap-4 w-full"><div className="text-xs uppercase tracking-widest text-gray-800 dark:text-gray-400 md:text-center md:col-span-1 transition-colors duration-300"><span className="md:hidden">Qty: </span>{quantity}</div><div className="text-sm text-[#121212] dark:text-[#F8F5F0] md:text-right md:col-span-2 flex justify-between items-center w-full md:w-auto md:justify-end transition-colors duration-300"><span className="md:mr-8">{currency(product.price * quantity)}</span><button onClick={() => actions.removeFromCart(product.id)} className="text-[0.6rem] uppercase tracking-widest text-gray-400 dark:text-gray-800 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-0.5">Remove</button></div></div></li>
+  return (
+    <li className="py-8 flex flex-col md:flex-row md:items-center">
+      <div className="flex flex-1 md:col-span-3 items-center mb-6 md:mb-0">
+        <ProductImage product={product} className="flex-shrink-0 w-24 h-32 bg-white dark:bg-[#1E1E1E] transition-colors duration-300" imageClass="w-full h-full object-cover" fallbackClass="w-full h-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-xs uppercase transition-colors duration-300" />
+        <div className="ml-6 flex flex-col justify-center">
+          <h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-1 transition-colors duration-300"><Link to={`/product/${product.id}`} actions={actions} className="hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors">{product.name}</Link></h3>
+          <p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-widest transition-colors duration-300">{product.scent_family}</p>
+        </div>
+      </div>
+      <div className="flex justify-between items-center md:flex-1 md:grid md:grid-cols-3 md:gap-4 w-full">
+        <div className="text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] md:text-center md:col-span-1 transition-colors duration-300 flex items-center justify-start md:justify-center gap-3">
+          <span className="md:hidden text-gray-800 dark:text-gray-400">Qty: </span>
+          <button onClick={() => actions.decreaseQuantity(product.id)} className="w-6 h-6 flex items-center justify-center border border-[#E5E5E5] dark:border-gray-800 hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors rounded-sm pb-0.5" aria-label="Decrease quantity">-</button>
+          <span>{quantity}</span>
+          <button onClick={() => actions.increaseQuantity(product.id)} className="w-6 h-6 flex items-center justify-center border border-[#E5E5E5] dark:border-gray-800 hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors rounded-sm pb-0.5" aria-label="Increase quantity">+</button>
+        </div>
+        <div className="text-sm text-[#121212] dark:text-[#F8F5F0] md:text-right md:col-span-2 flex justify-between items-center w-full md:w-auto md:justify-end transition-colors duration-300">
+          <span className="md:mr-8">{currency(product.price * quantity)}</span>
+          <button onClick={() => actions.removeFromCart(product.id)} className="text-[0.6rem] uppercase tracking-widest text-gray-400 dark:text-gray-800 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-0.5">Remove</button>
+        </div>
+      </div>
+    </li>
+  )
 }
 
 function OrderSummary({ total, actions }) {
