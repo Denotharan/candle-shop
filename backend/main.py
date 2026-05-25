@@ -233,6 +233,19 @@ def remove_cart_item(product_id: int, user: Dict[str, Any] = Depends(get_current
     return get_cart(user)
 
 
+@app.put("/cart/items/{product_id}/decrease")
+def decrease_cart_item(product_id: int, user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, int]:
+    user_id_str = str(user["id"])
+    cart_res = supabase.table("cart_items").select("*").eq("user_id", user_id_str).eq("product_id", product_id).execute()
+    if cart_res.data:
+        new_quantity = cart_res.data[0]["quantity"] - 1
+        if new_quantity > 0:
+            supabase.table("cart_items").update({"quantity": new_quantity}).eq("user_id", user_id_str).eq("product_id", product_id).execute()
+        else:
+            supabase.table("cart_items").delete().eq("user_id", user_id_str).eq("product_id", product_id).execute()
+    return get_cart(user)
+
+
 @app.post("/checkout")
 def checkout(user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, str]:
     user_id_str = str(user["id"])

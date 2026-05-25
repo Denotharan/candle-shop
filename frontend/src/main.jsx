@@ -165,6 +165,20 @@ function App() {
         flash(error.message)
       }
     },
+    async increaseQuantity(productId) {
+      try {
+        setCart(await api(`/cart/items/${productId}`, { method: 'POST' }))
+      } catch (error) {
+        flash(error.message)
+      }
+    },
+    async decreaseQuantity(productId) {
+      try {
+        setCart(await api(`/cart/items/${productId}/decrease`, { method: 'PUT' }))
+      } catch (error) {
+        flash(error.message)
+      }
+    },
     async checkout() {
       if (!Object.keys(cart).length) {
         flash('Your cart is empty.')
@@ -286,21 +300,21 @@ function Nav({ user, cart, actions }) {
   return (
     <nav className="fixed w-full top-0 z-50 glass-panel border-b-0 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20 items-center">
+        <div className="flex justify-between h-16 sm:h-20 items-center">
           <div className="flex items-center space-x-4">
             <Link to="/" actions={actions} className="text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors hidden sm:block">Shop</Link>
           </div>
           <div className="flex-1 flex justify-center">
-            <Link to="/" actions={actions} className="text-3xl font-medium brand-font tracking-widest text-[#121212] dark:text-[#F8F5F0] uppercase">Serein</Link>
+            <Link to="/" actions={actions} className="text-2xl sm:text-3xl font-medium brand-font tracking-widest text-[#121212] dark:text-[#F8F5F0] uppercase">Serein</Link>
           </div>
-          <div className="flex items-center space-x-6">
-            <button onClick={actions.toggleTheme} className="text-[#121212] dark:text-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors focus:outline-none" aria-label="Toggle Dark Mode">
+          <div className="flex items-center space-x-2 sm:space-x-6">
+            <button onClick={actions.toggleTheme} className="p-2 -ml-2 text-[#121212] dark:text-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors focus:outline-none" aria-label="Toggle Dark Mode">
               {isDark ? <SunIcon /> : <MoonIcon />}
             </button>
             {user ? (
               <>
                 <div className="relative group hidden sm:block">
-                  <span className="text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] cursor-pointer hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors">{user.name || 'Account'}</span>
+                  <span className="p-2 text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] cursor-pointer hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors">{user.name || 'Account'}</span>
                   <div className="absolute right-0 pt-4 hidden group-hover:block">
                     <div className="glass-panel p-4 min-w-[120px] rounded-lg shadow-lg flex flex-col space-y-3">
                       {user.is_admin && <Link to="/admin" actions={actions} className="block text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors">Admin</Link>}
@@ -308,14 +322,14 @@ function Nav({ user, cart, actions }) {
                     </div>
                   </div>
                 </div>
-                <button onClick={actions.logout} className="sm:hidden text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0]">Logout</button>
+                <button onClick={actions.logout} className="sm:hidden p-2 text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0]">Logout</button>
               </>
             ) : (
-              <Link to="/login" actions={actions} className="text-[#121212] dark:text-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors" aria-label="Sign In"><UserIcon /></Link>
+              <Link to="/login" actions={actions} className="p-2 text-[#121212] dark:text-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors" aria-label="Sign In"><UserIcon /></Link>
             )}
-            <Link to="/cart" actions={actions} className="text-[#121212] dark:text-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors relative" aria-label="Cart">
+            <Link to="/cart" actions={actions} className="p-2 text-[#121212] dark:text-[#F8F5F0] hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors relative" aria-label="Cart">
               <BagIcon />
-              {cartCount > 0 && <span className="absolute -top-1 -right-2 bg-[#D9B38C] text-[#121212] text-[0.65rem] font-bold rounded-full h-4 w-4 flex items-center justify-center">{cartCount}</span>}
+              {cartCount > 0 && <span className="absolute top-1 right-0 sm:-top-1 sm:-right-2 bg-[#D9B38C] text-[#121212] text-[0.65rem] font-bold rounded-full h-4 w-4 flex items-center justify-center">{cartCount}</span>}
             </Link>
           </div>
         </div>
@@ -349,7 +363,7 @@ function Home({ products, scentFamilies, family, actions }) {
           </div>
         </div>
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-16 sm:gap-x-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-12 gap-x-4 sm:gap-x-8 sm:gap-y-16">
             {filtered.map((product) => <ProductCard key={product.id} product={product} actions={actions} />)}
           </div>
         ) : (
@@ -391,31 +405,39 @@ function ProductDetail({ product, actions }) {
   if (!product) return <div className="text-center py-32 text-xs uppercase tracking-widest text-gray-500">Product not found.</div>
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-      <div className="md:grid md:grid-cols-2 md:gap-x-16 lg:gap-x-24">
-        <div className="mb-12 md:mb-0"><ProductImage product={product} className="w-full aspect-[3/4] bg-white dark:bg-[#1E1E1E] transition-colors duration-300" imageClass="h-full w-full object-cover object-center" fallbackClass="h-full w-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-4xl tracking-widest uppercase transition-colors duration-300" /></div>
-        <div className="flex flex-col justify-center pt-8 md:pt-0">
-          <p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-[0.2em] mb-4">{product.scent_family}</p>
-          <h1 className="text-4xl md:text-5xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-4 tracking-wide transition-colors duration-300">{product.name}</h1>
-          <p className="text-lg text-[#121212] dark:text-[#F8F5F0] mb-10 transition-colors duration-300">{currency(product.price)}</p>
-          <div className="text-sm text-gray-600 dark:text-gray-300 font-light leading-relaxed mb-12 transition-colors duration-300"><p>{product.description}</p></div>
-          <div className="border-t border-[#E5E5E5] dark:border-gray-800 mb-10 transition-colors duration-300">
-            <Detail title="Scent Profile">
-              <div className="grid grid-cols-1 gap-y-4">
-                <Info label="Top" value={product.scent_profile?.top || 'N/A'} />
-                <Info label="Heart" value={product.scent_profile?.middle || 'N/A'} />
-                <Info label="Base" value={product.scent_profile?.base || 'N/A'} />
-              </div>
-            </Detail>
-            <Detail title="Product Details">
-              <div className="space-y-3">
-                <Info label="Burn Time" value={product.burn_time} />
-                <div className="flex justify-between"><span className="uppercase">Availability</span><span className={product.stock_quantity > 0 ? 'text-[#121212] dark:text-[#F8F5F0]' : 'text-red-400 dark:text-red-400'}>{product.stock_quantity > 0 ? 'In Stock' : 'Sold Out'}</span></div>
-              </div>
-            </Detail>
+      <div className="md:grid md:grid-cols-2 md:gap-x-12 lg:gap-x-20 items-center">
+        <div className="mb-12 md:mb-0 relative group max-w-sm lg:max-w-md mx-auto w-full">
+          <div className="absolute -inset-4 bg-[#D9B38C]/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
+          <ProductImage product={product} className="relative w-full aspect-[3/4] bg-white dark:bg-[#1E1E1E] transition-colors duration-300 rounded-2xl overflow-hidden shadow-xl" imageClass="h-full w-full object-cover object-center" fallbackClass="h-full w-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-4xl tracking-widest uppercase transition-colors duration-300" />
+        </div>
+        <div className="flex flex-col justify-center glass-panel p-8 sm:p-12 lg:p-16 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-colors duration-300 relative overflow-hidden mt-8 md:mt-0">
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#D9B38C]/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[#D9B38C]/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="relative z-10">
+            <p className="text-[0.65rem] text-[#D9B38C] uppercase tracking-[0.3em] mb-4 font-medium">{product.scent_family}</p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-4 tracking-wide transition-colors duration-300 leading-tight">{product.name}</h1>
+            <p className="text-2xl text-[#121212] dark:text-[#F8F5F0] mb-8 transition-colors duration-300 font-light">{currency(product.price)}</p>
+            <div className="w-16 h-[1px] bg-[#D9B38C] mb-8"></div>
+            <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-light leading-relaxed mb-10 transition-colors duration-300"><p>{product.description}</p></div>
+            <div className="border-t border-[#E5E5E5] dark:border-gray-800 mb-10 transition-colors duration-300">
+              <Detail title="Scent Profile">
+                <div className="grid grid-cols-1 gap-y-4">
+                  <Info label="Top" value={product.scent_profile?.top || 'N/A'} />
+                  <Info label="Heart" value={product.scent_profile?.middle || 'N/A'} />
+                  <Info label="Base" value={product.scent_profile?.base || 'N/A'} />
+                </div>
+              </Detail>
+              <Detail title="Product Details">
+                <div className="space-y-3">
+                  <Info label="Burn Time" value={product.burn_time} />
+                  <div className="flex justify-between"><span className="uppercase text-xs tracking-widest text-gray-800 dark:text-gray-400">Availability</span><span className={product.stock_quantity > 0 ? 'text-[#121212] dark:text-[#F8F5F0] text-xs uppercase tracking-widest' : 'text-red-400 dark:text-red-400 text-xs uppercase tracking-widest'}>{product.stock_quantity > 0 ? 'In Stock' : 'Sold Out'}</span></div>
+                </div>
+              </Detail>
+            </div>
+            <button onClick={() => actions.addToCart(product.id)} disabled={product.stock_quantity <= 0} className={`w-full btn-primary px-8 py-5 text-xs uppercase tracking-[0.2em] transition-all duration-500 hover:shadow-xl hover:-translate-y-1 ${product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed hover:shadow-none hover:translate-y-0' : ''}`}>{product.stock_quantity > 0 ? 'Add to Bag' : 'Sold Out'}</button>
+            <TrustBadges />
+            <div className="mt-8 text-center"><p className="text-[0.65rem] uppercase tracking-[0.15em] text-gray-500 dark:text-gray-400">Complimentary shipping on orders over $100</p></div>
           </div>
-          <button onClick={() => actions.addToCart(product.id)} disabled={product.stock_quantity <= 0} className={`w-full btn-primary px-8 py-4 text-xs uppercase tracking-[0.2em] transition-all ${product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}>{product.stock_quantity > 0 ? 'Add to Bag' : 'Sold Out'}</button>
-          <TrustBadges />
-          <div className="mt-6 text-center"><p className="text-[0.6rem] uppercase tracking-widest text-gray-400 dark:text-gray-500">Free shipping on orders over $100</p></div>
         </div>
       </div>
     </div>
@@ -426,8 +448,8 @@ function Cart({ products, cart, actions }) {
   const items = Object.entries(cart).map(([id, quantity]) => ({ product: products.find((item) => item.id === Number(id)), quantity })).filter((item) => item.product)
   const total = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-      <div className="text-center mb-16"><h1 className="text-4xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-4 tracking-wide transition-colors duration-300">Your Bag</h1><div className="w-12 h-[1px] bg-[#D9B38C] mx-auto"></div></div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-32">
+      <div className="text-center mb-10 sm:mb-16"><h1 className="text-3xl sm:text-4xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-4 tracking-wide transition-colors duration-300">Your Bag</h1><div className="w-12 h-[1px] bg-[#D9B38C] mx-auto"></div></div>
       {items.length ? (
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-16">
           <div className="lg:col-span-8">
@@ -449,7 +471,7 @@ function Cart({ products, cart, actions }) {
 }
 
 function AuthCard({ title, subtitle, children }) {
-  return <div className="min-h-[60vh] flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8"><div className="max-w-lg w-full p-8 sm:p-10 glass-panel rounded-lg shadow-[0_18px_60px_rgba(18,18,18,0.08)] transition-colors duration-300"><div className="mb-10 text-center"><h2 className="text-3xl brand-font text-[#121212] dark:text-[#F8F5F0] mb-4 transition-colors duration-300">{title}</h2><div className="w-8 h-[1px] bg-[#D9B38C] mx-auto mb-6"></div><p className="text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400">{subtitle}</p></div>{children}</div></div>
+  return <div className="min-h-[60vh] flex items-center justify-center py-12 sm:py-20 px-4 sm:px-6 lg:px-8"><div className="max-w-lg w-full p-6 sm:p-10 glass-panel rounded-lg shadow-[0_18px_60px_rgba(18,18,18,0.08)] transition-colors duration-300"><div className="mb-8 sm:mb-10 text-center"><h2 className="text-2xl sm:text-3xl brand-font text-[#121212] dark:text-[#F8F5F0] mb-4 transition-colors duration-300">{title}</h2><div className="w-8 h-[1px] bg-[#D9B38C] mx-auto mb-6"></div><p className="text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400">{subtitle}</p></div>{children}</div></div>
 }
 
 function AuthMethodSelector({ mode, setMode }) {
@@ -575,11 +597,33 @@ function Info({ label, value }) {
 }
 
 function CartItem({ product, quantity, actions }) {
-  return <li className="py-8 flex flex-col md:flex-row md:items-center"><div className="flex flex-1 md:col-span-3 items-center mb-6 md:mb-0"><ProductImage product={product} className="flex-shrink-0 w-24 h-32 bg-white dark:bg-[#1E1E1E] transition-colors duration-300" imageClass="w-full h-full object-cover" fallbackClass="w-full h-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-xs uppercase transition-colors duration-300" /><div className="ml-6 flex flex-col justify-center"><h3 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-1 transition-colors duration-300"><Link to={`/product/${product.id}`} actions={actions} className="hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors">{product.name}</Link></h3><p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-widest transition-colors duration-300">{product.scent_family}</p></div></div><div className="flex justify-between items-center md:flex-1 md:grid md:grid-cols-3 md:gap-4 w-full"><div className="text-xs uppercase tracking-widest text-gray-800 dark:text-gray-400 md:text-center md:col-span-1 transition-colors duration-300"><span className="md:hidden">Qty: </span>{quantity}</div><div className="text-sm text-[#121212] dark:text-[#F8F5F0] md:text-right md:col-span-2 flex justify-between items-center w-full md:w-auto md:justify-end transition-colors duration-300"><span className="md:mr-8">{currency(product.price * quantity)}</span><button onClick={() => actions.removeFromCart(product.id)} className="text-[0.6rem] uppercase tracking-widest text-gray-400 dark:text-gray-800 hover:text-[#121212] dark:hover:text-[#F8F5F0] border-b border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-0.5">Remove</button></div></div></li>
+  return (
+    <li className="py-6 sm:py-8 flex flex-col md:flex-row md:items-center">
+      <div className="flex flex-1 md:col-span-3 items-center mb-6 md:mb-0">
+        <ProductImage product={product} className="flex-shrink-0 w-20 h-28 sm:w-24 sm:h-32 bg-white dark:bg-[#1E1E1E] transition-colors duration-300" imageClass="w-full h-full object-cover" fallbackClass="w-full h-full bg-[#f0eae1] dark:bg-[#2A2A2A] flex items-center justify-center text-[#D9B38C] brand-font text-xs uppercase transition-colors duration-300" />
+        <div className="ml-4 sm:ml-6 flex flex-col justify-center">
+          <h3 className="text-base sm:text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-1 transition-colors duration-300"><Link to={`/product/${product.id}`} actions={actions} className="hover:text-[#D9B38C] dark:hover:text-[#D9B38C] transition-colors">{product.name}</Link></h3>
+          <p className="text-[0.65rem] text-gray-800 dark:text-gray-400 uppercase tracking-widest transition-colors duration-300">{product.scent_family}</p>
+        </div>
+      </div>
+      <div className="flex justify-between items-center md:flex-1 md:grid md:grid-cols-3 md:gap-4 w-full">
+        <div className="text-sm sm:text-xs uppercase tracking-widest text-[#121212] dark:text-[#F8F5F0] md:text-center md:col-span-1 transition-colors duration-300 flex items-center justify-start md:justify-center gap-4 sm:gap-3">
+          <span className="md:hidden text-gray-800 dark:text-gray-400 text-xs">Qty: </span>
+          <button onClick={() => actions.decreaseQuantity(product.id)} className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center border border-[#E5E5E5] dark:border-gray-800 hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors rounded-sm pb-0.5 text-lg sm:text-base" aria-label="Decrease quantity">-</button>
+          <span className="w-4 text-center">{quantity}</span>
+          <button onClick={() => actions.increaseQuantity(product.id)} className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center border border-[#E5E5E5] dark:border-gray-800 hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors rounded-sm pb-0.5 text-lg sm:text-base" aria-label="Increase quantity">+</button>
+        </div>
+        <div className="text-sm text-[#121212] dark:text-[#F8F5F0] md:text-right md:col-span-2 flex justify-between items-center w-full md:w-auto md:justify-end transition-colors duration-300 mt-0">
+          <span className="md:mr-8 text-base sm:text-sm">{currency(product.price * quantity)}</span>
+          <button onClick={() => actions.removeFromCart(product.id)} className="p-2 -mr-2 md:mr-0 md:p-0 text-[0.65rem] sm:text-[0.6rem] uppercase tracking-widest text-gray-400 dark:text-gray-800 hover:text-[#121212] dark:hover:text-[#F8F5F0] sm:border-b sm:border-transparent hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-0.5">Remove</button>
+        </div>
+      </div>
+    </li>
+  )
 }
 
 function OrderSummary({ total, actions }) {
-  return <div className="glass-panel rounded-lg p-8 transition-colors duration-300"><h2 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-8 border-b border-[#E5E5E5] dark:border-gray-800 pb-4 transition-colors duration-300">Order Summary</h2><dl className="space-y-4 text-xs uppercase tracking-widest text-gray-800 dark:text-gray-400 transition-colors duration-300"><div className="flex items-center justify-between"><dt>Subtotal</dt><dd className="text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(total)}</dd></div><div className="flex items-center justify-between"><dt>Shipping</dt><dd className="text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">Calculated at checkout</dd></div><div className="flex items-center justify-between border-t border-[#E5E5E5] dark:border-gray-800 pt-6 mt-6 transition-colors duration-300"><dt className="text-sm font-bold text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">Total</dt><dd className="text-sm font-bold text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(total)}</dd></div></dl><div className="mt-10"><button onClick={actions.checkout} className="w-full btn-primary py-4 text-xs uppercase tracking-[0.2em]">Checkout Securely</button></div><div className="mt-6 text-center"><Link to="/" actions={actions} className="text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400 border-b border-gray-300 dark:border-gray-600 hover:text-[#121212] dark:hover:text-[#F8F5F0] hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Continue Shopping</Link></div></div>
+  return <div className="glass-panel rounded-lg p-6 sm:p-8 transition-colors duration-300"><h2 className="text-lg text-[#121212] dark:text-[#F8F5F0] brand-font tracking-wide mb-8 border-b border-[#E5E5E5] dark:border-gray-800 pb-4 transition-colors duration-300">Order Summary</h2><dl className="space-y-4 text-xs uppercase tracking-widest text-gray-800 dark:text-gray-400 transition-colors duration-300"><div className="flex items-center justify-between"><dt>Subtotal</dt><dd className="text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(total)}</dd></div><div className="flex items-center justify-between"><dt>Shipping</dt><dd className="text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">Calculated at checkout</dd></div><div className="flex items-center justify-between border-t border-[#E5E5E5] dark:border-gray-800 pt-6 mt-6 transition-colors duration-300"><dt className="text-sm font-bold text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">Total</dt><dd className="text-sm font-bold text-[#121212] dark:text-[#F8F5F0] transition-colors duration-300">{currency(total)}</dd></div></dl><div className="mt-10"><button onClick={actions.checkout} className="w-full btn-primary py-4 text-xs uppercase tracking-[0.2em]">Checkout Securely</button></div><div className="mt-6 text-center"><Link to="/" actions={actions} className="text-[0.65rem] uppercase tracking-widest text-gray-800 dark:text-gray-400 border-b border-gray-300 dark:border-gray-600 hover:text-[#121212] dark:hover:text-[#F8F5F0] hover:border-[#121212] dark:hover:border-[#F8F5F0] transition-colors pb-1">Continue Shopping</Link></div></div>
 }
 
 function Footer() {
