@@ -133,6 +133,35 @@ def update_product(product_id: int, product: ProductIn) -> Dict[str, Any]:
     return res.data[0]
 
 
+@app.get("/admin/stats", dependencies=[Depends(require_admin)])
+def get_admin_stats() -> Dict[str, Any]:
+    if supabase is None:
+        return {"users": 0, "products": 0, "scent_families": 0}
+    
+    users_res = supabase.table("users").select("id", count="exact").execute()
+    users_count = users_res.count if hasattr(users_res, "count") and users_res.count is not None else len(users_res.data)
+    
+    products_res = supabase.table("products").select("id", count="exact").execute()
+    products_count = products_res.count if hasattr(products_res, "count") and products_res.count is not None else len(products_res.data)
+    
+    families_res = supabase.table("scent_families").select("id", count="exact").execute()
+    families_count = families_res.count if hasattr(families_res, "count") and families_res.count is not None else len(families_res.data)
+
+    return {
+        "users": users_count,
+        "products": products_count,
+        "scent_families": families_count
+    }
+
+
+@app.get("/admin/users", dependencies=[Depends(require_admin)])
+def get_admin_users() -> List[Dict[str, Any]]:
+    if supabase is None:
+        return []
+    res = supabase.table("users").select("id, name, email, phone, is_admin, created_at").order("created_at", desc=True).execute()
+    return res.data
+
+
 @app.post("/auth/login")
 def login(credentials: Credentials) -> Dict[str, Any]:
     if not credentials.email and not credentials.phone:
@@ -251,3 +280,8 @@ def checkout(user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, str]
     user_id_str = str(user["id"])
     supabase.table("cart_items").delete().eq("user_id", user_id_str).execute()
     return {"status": "confirmed"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
