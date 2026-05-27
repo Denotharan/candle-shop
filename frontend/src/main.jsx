@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'https://candle-shop-git-main-denotharan-s-projects.vercel.app').replace(/\/+$/, '')
+const API_BASE = (import.meta.env.VITE_API_URL || 'https://candle-shop-liard.vercel.app').replace(/\/+$/, '')
 const currency = (value) => `$${Number(value).toFixed(2)}`
 const productFromForm = (form) => ({
   name: form.get('name'),
@@ -468,7 +468,7 @@ function Cart({ products, cart, actions }) {
       <div className="text-center mb-10 sm:mb-16"><h1 className="text-3xl sm:text-4xl text-[#121212] dark:text-[#F8F5F0] brand-font mb-4 tracking-wide transition-colors duration-300">Your Bag</h1><div className="w-12 h-[1px] bg-[#D9B38C] mx-auto"></div></div>
       {items.length ? (
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-16">
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-8 glass-panel rounded-lg p-6 sm:p-8 transition-colors duration-300">
             <div className="hidden md:grid grid-cols-6 gap-4 border-b border-[#121212] dark:border-[#F8F5F0] pb-4 mb-8 text-xs uppercase tracking-widest text-gray-800 dark:text-gray-400 transition-colors duration-300"><div className="col-span-3">Product</div><div className="col-span-1 text-center">Quantity</div><div className="col-span-2 text-right">Total</div></div>
             <ul className="divide-y divide-[#E5E5E5] dark:divide-gray-800 transition-colors duration-300">
               {items.map(({ product, quantity }) => <CartItem key={product.id} product={product} quantity={quantity} actions={actions} />)}

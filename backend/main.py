@@ -144,7 +144,7 @@ def get_admin_stats() -> Dict[str, Any]:
     products_res = supabase.table("products").select("id", count="exact").execute()
     products_count = products_res.count if hasattr(products_res, "count") and products_res.count is not None else len(products_res.data)
     
-    families_res = supabase.table("scent_families").select("id", count="exact").execute()
+    families_res = supabase.table("scent_families").select("name", count="exact").execute()
     families_count = families_res.count if hasattr(families_res, "count") and families_res.count is not None else len(families_res.data)
 
     return {
@@ -158,8 +158,8 @@ def get_admin_stats() -> Dict[str, Any]:
 def get_admin_users() -> List[Dict[str, Any]]:
     if supabase is None:
         return []
-    res = supabase.table("users").select("id, name, email, phone, is_admin, created_at").order("created_at", desc=True).execute()
-    return res.data
+    res = supabase.table("users").select("id, name, email, is_admin, created_at").order("created_at", desc=True).execute()
+    return [{**user, "phone": user.get("phone", "")} for user in res.data]
 
 
 @app.post("/auth/login")
